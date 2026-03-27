@@ -243,13 +243,36 @@ export default function HomePage() {
         className="container visual-mosaic"
         aria-label="Learning visuals"
       >
-        <div className="mosaic-a" />
-        <div className="mosaic-b" />
+        <div className="mosaic-a mosaic-mini-card">
+          <p className="mosaic-mini-label">Live Support</p>
+          <h4>{home.channelBand[0] || "Live Classes"}</h4>
+          <p>Daily concept sessions with clear board explanations.</p>
+        </div>
+        <div className="mosaic-b mosaic-mini-card">
+          <p className="mosaic-mini-label">Performance System</p>
+          <h4>{home.channelBand[3] || "Test Series"}</h4>
+          <p>Weekly evaluation to track progress and fill learning gaps.</p>
+        </div>
         <div className="mosaic-c">
           <h3>{home.mosaic.title}</h3>
           <p>{home.mosaic.text}</p>
+          <div className="mosaic-stat-row">
+            {stats.slice(0, 3).map((item) => (
+              <div key={item.label} className="mosaic-stat-pill">
+                <strong>
+                  {item.value.toLocaleString()}
+                  {item.suffix}
+                </strong>
+                <span>{item.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="mosaic-d" />
+        <div className="mosaic-d mosaic-mini-card">
+          <p className="mosaic-mini-label">Mentor Feedback</p>
+          <h4>{home.channelBand[4] || "Mentor Feedback"}</h4>
+          <p>Answer reviews and practical suggestions for every learner.</p>
+        </div>
       </section>
 
       <section className="newsletter container">

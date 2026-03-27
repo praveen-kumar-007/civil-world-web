@@ -79,6 +79,17 @@ function getSocialIcon(name) {
   );
 }
 
+function PlayStoreLogo() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 2.8v18.4c0 .7.7 1.1 1.3.8l10.8-9.2L4.3 2c-.6-.3-1.3.1-1.3.8Z" fill="#00d26a" />
+      <path d="M15.1 12 19.6 8.2c.6-.5.4-1.5-.4-1.8L12.3 3.9 8 8.2 15.1 12Z" fill="#00a6ff" />
+      <path d="m8 15.8 4.3 4.3 6.9-2.5c.8-.3 1-1.3.4-1.8L15.1 12 8 15.8Z" fill="#ff3f4d" />
+      <path d="M8 8.2v7.6L15.1 12 8 8.2Z" fill="#ffd83d" />
+    </svg>
+  );
+}
+
 export default function Layout({ children, appValue }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showTop, setShowTop] = useState(false);
@@ -162,8 +173,15 @@ export default function Layout({ children, appValue }) {
 
       <footer className="site-footer">
         <div className="container footer-grid">
-          <div>
-            <h3>{brandName}</h3>
+          <div className="footer-brand-block">
+            <div className="footer-brand-head">
+              <img
+                className="footer-brand-logo"
+                src="/logo.png"
+                alt="Civil World logo"
+              />
+              <h3>{brandName}</h3>
+            </div>
             <p>{footerDescription}</p>
             <Link className="admin-footer-link" to="/admin">
               Admin Panel
@@ -191,15 +209,25 @@ export default function Layout({ children, appValue }) {
             </ul>
           </div>
           <div>
-            <h4>Mobile App</h4>
-            <a
-              href={playStoreLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="playstore-link"
-            >
-              Open on Google Play
-            </a>
+            <div className="playstore-card">
+              <div className="playstore-header">
+                <span className="playstore-logo">
+                  <PlayStoreLogo />
+                </span>
+                <div>
+                  <h4>Open in Mobile App</h4>
+                  <p>Classes, notes, and materials in one place.</p>
+                </div>
+              </div>
+              <a
+                href={playStoreLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="playstore-link playstore-cta"
+              >
+                Get it on Google Play
+              </a>
+            </div>
           </div>
         </div>
         <p className="copyright">
