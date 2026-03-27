@@ -15,6 +15,13 @@
   box-sizing: border-box;
 }
 
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
 html,
 body,
 #root {
@@ -158,6 +165,7 @@ body.theme-night {
   font-family: "Bebas Neue", sans-serif;
   letter-spacing: 1px;
   font-size: 2rem;
+  line-height: 1;
 }
 
 .nav-links {
@@ -640,6 +648,7 @@ h2 {
 .stat-card h3 {
   font-size: 2rem;
   margin-bottom: 0.2rem;
+  word-break: break-word;
 }
 
 .page-card {
@@ -1606,6 +1615,7 @@ h2 {
   margin: 0;
   color: var(--muted);
   font-size: 0.9rem;
+  overflow-wrap: anywhere;
 }
 
 .admin-enquiry-item strong {
@@ -1896,6 +1906,20 @@ h2 {
     width: min(1120px, 94vw);
   }
 
+  .nav {
+    min-height: 70px;
+  }
+
+  .brand-logo {
+    width: 42px;
+    height: 42px;
+  }
+
+  .brand-text {
+    font-size: 1.4rem;
+    letter-spacing: 0.6px;
+  }
+
   .page-hero {
     padding: 2.3rem 0 1.2rem;
   }
@@ -1919,6 +1943,14 @@ h2 {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.2rem;
+  }
+
+  .stats-grid {
+    gap: 0.75rem;
+  }
+
+  .stat-card h3 {
+    font-size: 1.75rem;
   }
 }
 

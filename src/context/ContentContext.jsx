@@ -62,6 +62,38 @@ function loadStoredContent() {
       );
     }
 
+    // Keep public stats aligned with current real values even on stale devices.
+    if (Array.isArray(merged.data?.stats)) {
+      merged.data.stats = merged.data.stats.map((item) => {
+        if (item?.label === "YouTube Subscribers") {
+          return { ...item, value: 34000, suffix: "+" };
+        }
+
+        if (item?.label === "School + B.Tech Students Mentored") {
+          return { ...item, value: 5000, suffix: "+" };
+        }
+
+        if (item?.label === "Years Experience") {
+          return { ...item, value: 8, suffix: "+" };
+        }
+
+        if (item?.label === "Satisfaction") {
+          return { ...item, value: 95, suffix: "%" };
+        }
+
+        return item;
+      });
+    }
+
+    if (Array.isArray(merged.about?.profileHighlights)) {
+      merged.about.profileHighlights = merged.about.profileHighlights.map((item) => {
+        if (item?.subtitle === "YouTube Learners") {
+          return { ...item, title: "34K+" };
+        }
+        return item;
+      });
+    }
+
     return merged;
   } catch {
     return defaultContent;
