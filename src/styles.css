@@ -14,6 +14,21 @@
   box-sizing: border-box;
 }
 
+button {
+  font: inherit;
+  color: inherit;
+  background-color: transparent;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
 html,
 body,
 #root {
@@ -375,6 +390,7 @@ h2 {
   border-radius: 999px;
   padding: 0.72rem 1.2rem;
   border: 2px solid transparent;
+  background: transparent;
   font-weight: 700;
   text-decoration: none;
   display: inline-flex;
@@ -419,6 +435,21 @@ h2 {
 .btn-outline {
   border-color: var(--ink);
   color: var(--ink);
+  background: color-mix(in srgb, var(--surface) 92%, #fff);
+}
+
+.btn-outline:hover {
+  background: color-mix(in srgb, var(--surface) 78%, #fff);
+}
+
+body.theme-night .btn-outline {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--line) 90%, #ffffff);
+  background: color-mix(in srgb, var(--surface) 94%, #0f1417);
+}
+
+body.theme-night .btn-outline:hover {
+  background: color-mix(in srgb, var(--surface) 84%, #182126);
 }
 
 .hero-badges {
@@ -903,6 +934,18 @@ h2 {
   color: #fff;
 }
 
+body.theme-night .filter-btn {
+  background: color-mix(in srgb, var(--surface) 94%, #0f1417);
+  border-color: color-mix(in srgb, var(--line) 90%, #ffffff);
+  color: var(--ink);
+}
+
+body.theme-night .filter-btn.active {
+  background: color-mix(in srgb, var(--accent) 78%, #111);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  color: #fff;
+}
+
 .gallery-item {
   border: 0;
   padding: 0;
@@ -1085,6 +1128,11 @@ h2 {
   font-weight: 700;
 }
 
+body.theme-night .admin-filter-chip button {
+  background: rgba(241, 64, 49, 0.24);
+  color: #ffe0d6;
+}
+
 .admin-resource-list {
   display: grid;
   gap: 0.85rem;
@@ -1188,6 +1236,16 @@ h2 {
   border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
   box-shadow: 0 10px 20px rgba(211, 15, 30, 0.14);
   color: var(--accent-dark);
+}
+
+body.theme-night .admin-switch-btn {
+  background: color-mix(in srgb, var(--surface) 94%, #0f1417);
+  border-color: color-mix(in srgb, var(--line) 90%, #ffffff);
+  color: var(--ink);
+}
+
+body.theme-night .admin-switch-btn.active {
+  color: #ffd8cb;
 }
 
 .admin-switch-link {
