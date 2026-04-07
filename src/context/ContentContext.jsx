@@ -132,8 +132,12 @@ function loadStoredContent() {
     if (!Array.isArray(merged.home?.freeResources?.youtubeLinks)) {
       merged.home.freeResources.youtubeLinks = requestedYoutubeLinks;
     } else {
-      const urls = merged.home.freeResources.youtubeLinks.map((item) => item?.url);
-      const hasLegacyDefault = urls.includes("https://www.youtube.com/watch?v=rfscVS0vtbw");
+      const urls = merged.home.freeResources.youtubeLinks.map(
+        (item) => item?.url,
+      );
+      const hasLegacyDefault = urls.includes(
+        "https://www.youtube.com/watch?v=rfscVS0vtbw",
+      );
       const hasRequestedLinks =
         urls.includes("https://youtu.be/E-qCrzcvPbM?si=83_mb2JBMlSsWTIe") ||
         urls.includes("https://youtu.be/ZCypdX6wf-I?si=hZgn51MfJIfvM3nq");

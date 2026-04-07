@@ -225,6 +225,42 @@ body.theme-night {
   margin: 0.4rem 0;
 }
 
+.mobile-menu a {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
+  border-radius: 12px;
+  padding: 0.58rem 0.7rem;
+  background: color-mix(in srgb, var(--surface) 88%, #fff);
+}
+
+.mobile-menu a.active {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  color: var(--accent);
+}
+
+.mobile-nav-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--line));
+  background: color-mix(in srgb, var(--accent) 12%, #fff);
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.mobile-nav-icon svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.mobile-nav-label {
+  font-weight: 700;
+}
+
 .mobile-menu.show {
   display: block;
 }
@@ -1452,6 +1488,7 @@ h2 {
   background: color-mix(in srgb, var(--accent) 14%, #fff);
   border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--line));
   flex-shrink: 0;
+  color: var(--accent-dark);
 }
 
 .social-icon svg {
@@ -1496,6 +1533,74 @@ h2 {
 .back-to-top.show {
   opacity: 1;
   pointer-events: auto;
+}
+
+body.theme-night .site-footer {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface) 96%, #101417),
+    color-mix(in srgb, var(--surface) 88%, #0f1417)
+  );
+}
+
+body.theme-night .footer-col-card,
+body.theme-night .app-link-card,
+body.theme-night .mobile-menu a,
+body.theme-night .admin-metric-item,
+body.theme-night .admin-enquiry-item,
+body.theme-night .admin-empty-inbox,
+body.theme-night .admin-filter-chip {
+  background: color-mix(in srgb, var(--surface) 94%, #101417);
+  border-color: color-mix(in srgb, var(--line) 92%, #ffffff);
+}
+
+body.theme-night .mobile-menu {
+  background: color-mix(in srgb, var(--surface) 97%, #0f1417);
+}
+
+body.theme-night .social-link {
+  background: color-mix(in srgb, var(--surface) 95%, #0f1417);
+  border-color: color-mix(in srgb, var(--line) 92%, #ffffff);
+  color: var(--ink);
+}
+
+body.theme-night .social-link:hover {
+  color: #ffd8cb;
+  box-shadow: 0 12px 24px rgba(211, 15, 30, 0.25);
+}
+
+body.theme-night .social-icon {
+  color: #ffd8cb;
+  background: rgba(241, 64, 49, 0.26);
+  border-color: rgba(241, 64, 49, 0.5);
+}
+
+body.theme-night .pill,
+body.theme-night .resource-chip,
+body.theme-night .status-text {
+  color: #ffbca7;
+  border-color: rgba(255, 142, 75, 0.45);
+  background: rgba(255, 142, 75, 0.14);
+}
+
+body.theme-night .admin-warning {
+  border-color: rgba(255, 142, 75, 0.5);
+  background: rgba(255, 142, 75, 0.14);
+  color: #ffd8cb;
+}
+
+body.theme-night input,
+body.theme-night textarea,
+body.theme-night select,
+body.theme-night .admin-json-editor {
+  background: color-mix(in srgb, var(--surface) 95%, #0f1417);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--line) 92%, #ffffff);
+}
+
+body.theme-night input::placeholder,
+body.theme-night textarea::placeholder {
+  color: color-mix(in srgb, var(--muted) 90%, #ffffff);
 }
 
 @keyframes bodyFade {

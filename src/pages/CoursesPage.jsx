@@ -18,7 +18,7 @@ export default function CoursesPage() {
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
     cards.forEach((card) => observer.observe(card));
     return () => observer.disconnect();
@@ -28,7 +28,7 @@ export default function CoursesPage() {
     <div className="courses-page-wrapper">
       <div className="course-blurred-bg course-bg-1"></div>
       <div className="course-blurred-bg course-bg-2"></div>
-      
+
       <PageHero
         eyebrow="Premium Programs"
         title="Elevate Your Engineering Path"
@@ -61,9 +61,9 @@ export default function CoursesPage() {
                 <h3>{course.title}</h3>
                 <p>{course.description}</p>
                 <div className="course-footer">
-                  <button 
+                  <button
                     className="enroll-btn"
-                    onClick={() => navigate('/contact')}
+                    onClick={() => navigate("/contact")}
                   >
                     Enroll Now
                   </button>

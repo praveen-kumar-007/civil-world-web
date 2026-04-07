@@ -11,6 +11,49 @@ const navItems = [
   { to: "/contact", label: "Contact" },
 ];
 
+function getNavIcon(path) {
+  switch (path) {
+    case "/":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3 3.5 10.1V21h6.2v-5.4h4.6V21h6.2V10.1L12 3Z" />
+        </svg>
+      );
+    case "/about":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 4.1a1.3 1.3 0 1 1-1.3 1.3A1.3 1.3 0 0 1 12 6.1Zm1.1 11.8h-2.2v-7h2.2v7Z" />
+        </svg>
+      );
+    case "/courses":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 5.2A2.2 2.2 0 0 1 5.2 3H21v15.8H6.1A3.1 3.1 0 0 0 3 21V5.2Zm3.1-.4a1 1 0 0 0-1 1V19a4 4 0 0 1 1-.2H19V4.8H6.1Z" />
+        </svg>
+      );
+    case "/resources":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 4h8v8H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm8.5 2.2 2.2 2.2 4.8-4.8 1.5 1.5-6.3 6.3L11 17.7l1.5-1.5Z" />
+        </svg>
+      );
+    case "/gallery":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5Zm2 0v10.2l3.9-3.9 2.8 2.8 4.1-4.1 3.2 3.2V5H5Zm12.4 2.4a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8Z" />
+        </svg>
+      );
+    case "/contact":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 5.8A2.8 2.8 0 0 1 5.8 3h12.4A2.8 2.8 0 0 1 21 5.8v12.4a2.8 2.8 0 0 1-2.8 2.8H5.8A2.8 2.8 0 0 1 3 18.2V5.8Zm2.2-.6 6.8 5 6.8-5H5.2Zm13.6 13.6V8l-6.2 4.6a1 1 0 0 1-1.2 0L5.2 8v10.8h13.6Z" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
 function getSocialIcon(name) {
   const key = String(name || "").toLowerCase();
 
@@ -144,7 +187,8 @@ export default function Layout({ children }) {
               to={item.to}
               onClick={() => setMenuOpen(false)}
             >
-              {item.label}
+              <span className="mobile-nav-icon">{getNavIcon(item.to)}</span>
+              <span className="mobile-nav-label">{item.label}</span>
             </NavLink>
           ))}
         </div>
@@ -204,15 +248,23 @@ export default function Layout({ children }) {
                 </a>
               </li>
               <li>
-                <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer">
+                <a
+                  href="https://wa.me/919999999999"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   WhatsApp Support
                 </a>
               </li>
               <li>
-                <a href="mailto:civilworld.edu@example.com">civilworld.edu@example.com</a>
+                <a href="mailto:civilworld.edu@example.com">
+                  civilworld.edu@example.com
+                </a>
               </li>
               <li>
-                <span className="footer-plain-text">Mon-Sat: 8:00 AM - 8:00 PM</span>
+                <span className="footer-plain-text">
+                  Mon-Sat: 8:00 AM - 8:00 PM
+                </span>
               </li>
             </ul>
           </div>
@@ -229,7 +281,9 @@ export default function Layout({ children }) {
                     className="social-link"
                     aria-label={item.name}
                   >
-                    <span className="social-icon">{getSocialIcon(item.name)}</span>
+                    <span className="social-icon">
+                      {getSocialIcon(item.name)}
+                    </span>
                     <span className="social-name">{item.name}</span>
                   </a>
                 </li>
@@ -250,9 +304,18 @@ export default function Layout({ children }) {
               />
               <span className="playstore-badge" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
-                  <path d="M3 2.8v18.4c0 .7.7 1.1 1.3.8l10.8-9.2L4.3 2c-.6-.3-1.3.1-1.3.8Z" fill="#00d26a" />
-                  <path d="M15.1 12 19.6 8.2c.6-.5.4-1.5-.4-1.8L12.3 3.9 8 8.2 15.1 12Z" fill="#00a6ff" />
-                  <path d="m8 15.8 4.3 4.3 6.9-2.5c.8-.3 1-1.3.4-1.8L15.1 12 8 15.8Z" fill="#ff3f4d" />
+                  <path
+                    d="M3 2.8v18.4c0 .7.7 1.1 1.3.8l10.8-9.2L4.3 2c-.6-.3-1.3.1-1.3.8Z"
+                    fill="#00d26a"
+                  />
+                  <path
+                    d="M15.1 12 19.6 8.2c.6-.5.4-1.5-.4-1.8L12.3 3.9 8 8.2 15.1 12Z"
+                    fill="#00a6ff"
+                  />
+                  <path
+                    d="m8 15.8 4.3 4.3 6.9-2.5c.8-.3 1-1.3.4-1.8L15.1 12 8 15.8Z"
+                    fill="#ff3f4d"
+                  />
                   <path d="M8 8.2v7.6L15.1 12 8 8.2Z" fill="#ffd83d" />
                 </svg>
               </span>
