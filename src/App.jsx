@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import Layout from "./components/Layout";
-import { ContentProvider } from "./context/ContentContext";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import CoursesPage from "./pages/CoursesPage";
@@ -22,28 +21,28 @@ function ScrollToTop() {
 }
 
 export default function App() {
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem("civilWorldTheme") || "day",
-  );
-
   useEffect(() => {
-    document.body.classList.toggle("theme-night", theme === "night");
-    localStorage.setItem("civilWorldTheme", theme);
-  }, [theme]);
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
 
-  const appValue = useMemo(
-    () => ({
-      theme,
-      toggleTheme: () =>
-        setTheme((current) => (current === "night" ? "day" : "night")),
-    }),
-    [theme],
-  );
+    const applySystemTheme = () => {
+      document.body.classList.toggle("theme-night", media.matches);
+    };
+
+    applySystemTheme();
+
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", applySystemTheme);
+      return () => media.removeEventListener("change", applySystemTheme);
+    }
+
+    media.addListener(applySystemTheme);
+    return () => media.removeListener(applySystemTheme);
+  }, []);
 
   return (
-    <ContentProvider>
+    <>
       <ScrollToTop />
-      <Layout appValue={appValue}>
+      <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
@@ -51,11 +50,11 @@ export default function App() {
           <Route path="/resources" element={<ResourcesPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/*" element={<AdminPage />} />
           <Route path="/home" element={<Navigate to="/" replace />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Layout>
-    </ContentProvider>
+    </>
   );
 }

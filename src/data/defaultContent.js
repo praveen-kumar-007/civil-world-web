@@ -17,22 +17,21 @@ export const defaultContent = {
     typedWords: ["clarity", "strategy", "confidence", "high scores"],
     updates: [
       "New Batch Starts Monday",
-      "Special Mentorship for B.Tech Students in Haryana",
+      "Special Mentorship for Polytechnic and B.Tech Students in Haryana",
       "Live Doubt Solving Every Saturday",
-      "Free Political Theory Workshop This Week",
+      "Free Engineering Workshop This Week",
       "34K+ YouTube Learning Community",
-      "Board + Competitive Exam Strategy Sessions",
+      "Diploma + Engineering Exam Strategy Sessions",
     ],
-    eyebrow: "Haryana's Trusted Mentor for School and B.Tech Learners",
-    titleTemplate:
-      "Master Political Science and all B.Tech subjects with {word}.",
+    eyebrow: "Haryana's Trusted Mentor for Polytechnic and B.Tech Learners",
+    titleTemplate: "Master Polytechnic and B.Tech subjects with {word}.",
     subtitle:
-      "Visual learning systems, live mentoring, and exam-ready training for school, competitive, and B.Tech students across all major subjects in Haryana.",
+      "Visual learning systems, live mentoring, and exam-ready training for Polytechnic and B.Tech students across major engineering subjects in Haryana.",
     heroBadges: [
       "Answer Writing Mastery",
       "Live Mentorship",
       "Hindi + English Support",
-      "All B.Tech Subjects",
+      "Polytechnic + B.Tech Subjects",
     ],
     quickJourney: [
       "Watch Demo",
@@ -41,8 +40,12 @@ export const defaultContent = {
       "Track Progress",
     ],
     visualPrograms: [
-      { title: "School Excellence", badge: "Class 11-12", glow: "sky" },
-      { title: "B.Tech Support", badge: "Haryana Focus", glow: "rose" },
+      {
+        title: "Polytechnic Excellence",
+        badge: "Diploma Semesters",
+        glow: "sky",
+      },
+      { title: "B.Tech Support", badge: "Engineering Focus", glow: "rose" },
       { title: "Exam Accelerator", badge: "Crash Mode", glow: "mint" },
     ],
     pageCards: [
@@ -60,6 +63,30 @@ export const defaultContent = {
       "Mentor Feedback",
       "Career Guidance",
     ],
+    freeResources: {
+      heading: "Free Resources",
+      subtitle:
+        "Download practical notes, question banks, and revision sheets for Polytechnic and B.Tech.",
+      categories: ["B.Tech", "Diploma", "Programming", "Others"],
+      items: [
+        {
+          id: "free-res-1",
+          title: "Engineering Maths Formula Sheet",
+          url: "https://drive.google.com/file/d/your-file-id/view",
+          category: "B.Tech",
+        },
+      ],
+      youtubeLinks: [
+        {
+          id: "yt-res-1",
+          url: "https://youtu.be/E-qCrzcvPbM?si=83_mb2JBMlSsWTIe",
+        },
+        {
+          id: "yt-res-2",
+          url: "https://youtu.be/ZCypdX6wf-I?si=hZgn51MfJIfvM3nq",
+        },
+      ],
+    },
     testimonialsTitle: "Result snapshots",
     faqTitle: "Quick answers",
     mosaic: {
@@ -71,19 +98,19 @@ export const defaultContent = {
       title: "Get class alerts and notes.",
     },
     cta: {
-      title: "Ready to level up your Political Science preparation?",
-      text: "Professional learning tracks for school and B.Tech outcomes.",
+      title: "Ready to level up your Polytechnic and B.Tech preparation?",
+      text: "Professional learning tracks for Polytechnic and B.Tech outcomes.",
     },
   },
   about: {
     eyebrow: "Mentor Story",
     title: "Professional teaching with modern visual methods",
     subtitle:
-      "A focused mentorship model for school, competitive, and B.Tech students in Haryana.",
+      "A focused mentorship model for Polytechnic and B.Tech students in Haryana.",
     profileHighlights: [
       { title: "8+ Years", subtitle: "Mentorship" },
       { title: "34K+", subtitle: "YouTube Learners" },
-      { title: "Haryana", subtitle: "School + B.Tech Focus" },
+      { title: "Haryana", subtitle: "Polytechnic + B.Tech Focus" },
     ],
     visualCards: [
       "Concept Studio",
@@ -95,7 +122,7 @@ export const defaultContent = {
     eyebrow: "Programs",
     title: "Choose your visual learning track",
     subtitle:
-      "Concise, professional programs for school, competitive, and B.Tech students in Haryana.",
+      "Concise, professional programs for Polytechnic and B.Tech students in Haryana.",
     courseOutcomes: [
       "Concept Clarity",
       "Exam Writing",
@@ -129,20 +156,25 @@ export const defaultContent = {
       { title: "Fast Response", subtitle: "Within 12-24 hours" },
       {
         title: "Professional Guidance",
-        subtitle: "School + B.Tech in Haryana",
+        subtitle: "Polytechnic + B.Tech in Haryana",
       },
       { title: "Mode Flexibility", subtitle: "Online live and hybrid" },
     ],
-    studentTypes: ["School Student", "B.Tech Student", "Competitive Aspirant"],
+    studentTypes: [
+      "Polytechnic Student",
+      "B.Tech Student",
+      "Lateral Entry Aspirant",
+    ],
     programTypes: [
       "Foundation Batch",
+      "Polytechnic Support",
       "B.Tech Support",
       "Crash Course",
       "Test Series",
     ],
     learningModes: ["Online Live", "Recorded + Live", "Weekend Intensive"],
     mailTo: "civilworld.edu@example.com",
-    mailSubject: "Civil World - School and B.Tech Course Enquiry",
+    mailSubject: "Civil World - Polytechnic and B.Tech Course Enquiry",
   },
   notFound: {
     title: "404",
@@ -150,7 +182,7 @@ export const defaultContent = {
   },
   footer: {
     description:
-      "Haryana based Political Science teaching platform for school and B.Tech students, with clear concepts, strategy, and exam-ready mentorship.",
+      "Haryana based teaching platform for Polytechnic and B.Tech students, with clear concepts, strategy, and exam-ready mentorship.",
   },
   data: {
     socialLinks,

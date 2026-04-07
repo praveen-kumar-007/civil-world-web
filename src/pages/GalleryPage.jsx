@@ -1,29 +1,25 @@
 import { useState } from "react";
 import PageHero from "../components/PageHero";
-import { useContent } from "../context/ContentContext";
+import { galleryImages } from "../data/siteData";
 
 export default function GalleryPage() {
-  const { content } = useContent();
-  const { galleryPage } = content;
-  const galleryImages = content.data.galleryImages;
-
   const [selectedImage, setSelectedImage] = useState("");
 
   return (
     <>
       <PageHero
-        eyebrow={galleryPage.eyebrow}
-        title={galleryPage.title}
-        subtitle={galleryPage.subtitle}
+        eyebrow="Gallery"
+        title="Classroom moments and student community"
+        subtitle="A visual glimpse of classes, discussions, and learning milestones."
       />
 
       <section className="container">
-        <div className="gallery-grid gallery-mosaic-grid">
-          {galleryImages.map((image, index) => (
+        <div className="gallery-grid">
+          {galleryImages.map((image) => (
             <button
               key={image}
               type="button"
-              className={`gallery-item gallery-item-${(index % 6) + 1}`}
+              className="gallery-item"
               onClick={() => setSelectedImage(image)}
             >
               <img src={image} alt="Civil World classroom" loading="lazy" />

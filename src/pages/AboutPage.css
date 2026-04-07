@@ -1,0 +1,116 @@
+/* src/pages/AboutPage.css */
+
+.about-page-wrapper {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 4rem;
+}
+
+.instructor-section {
+  padding: 4rem 0;
+}
+
+.instructor-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .instructor-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+}
+
+.instructor-image-container {
+  position: relative;
+  border-radius: 24px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.instructor-image {
+  width: 100%;
+  border-radius: 24px;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+  border: 4px solid var(--surface);
+}
+
+.instructor-backdrop {
+  position: absolute;
+  top: 5%;
+  left: -5%;
+  width: 110%;
+  height: 110%;
+  background: linear-gradient(135deg, var(--accent), #ff8e4b);
+  border-radius: 30px;
+  z-index: 1;
+  opacity: 0.15;
+  transform: rotate(-3deg);
+  transition: transform 0.4s ease;
+}
+
+.instructor-image-container:hover .instructor-backdrop {
+  transform: rotate(0deg) scale(1.02);
+}
+
+.instructor-info h2 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.instructor-subtitle {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 1.5rem;
+}
+
+.instructor-bio {
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--line) 40%, transparent);
+  padding-top: 2rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--ink);
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.about-features {
+  padding-top: 2rem;
+}

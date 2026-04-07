@@ -1,6 +1,6 @@
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useContent } from "../context/ContentContext";
+import { playStoreLink, socialLinks } from "../data/siteData";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -12,9 +12,7 @@ const navItems = [
 ];
 
 function getSocialIcon(name) {
-  const key = String(name || "")
-    .toLowerCase()
-    .trim();
+  const key = String(name || "").toLowerCase();
 
   if (key.includes("youtube")) {
     return (
@@ -74,32 +72,15 @@ function getSocialIcon(name) {
 
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 4h16v16H4z" />
+      <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 1.8a8.2 8.2 0 0 1 6.4 13.3h-3.1a6.4 6.4 0 0 0 2.6-5.1h-1.8a4.6 4.6 0 1 1-9.2 0H5.1a6.4 6.4 0 0 0 2.6 5.1H5.6A8.2 8.2 0 0 1 12 3.8Z" />
     </svg>
   );
 }
 
-function PlayStoreLogo() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 2.8v18.4c0 .7.7 1.1 1.3.8l10.8-9.2L4.3 2c-.6-.3-1.3.1-1.3.8Z" fill="#00d26a" />
-      <path d="M15.1 12 19.6 8.2c.6-.5.4-1.5-.4-1.8L12.3 3.9 8 8.2 15.1 12Z" fill="#00a6ff" />
-      <path d="m8 15.8 4.3 4.3 6.9-2.5c.8-.3 1-1.3.4-1.8L15.1 12 8 15.8Z" fill="#ff3f4d" />
-      <path d="M8 8.2v7.6L15.1 12 8 8.2Z" fill="#ffd83d" />
-    </svg>
-  );
-}
-
-export default function Layout({ children, appValue }) {
+export default function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showTop, setShowTop] = useState(false);
   const [progress, setProgress] = useState(0);
-  const { content } = useContent();
-
-  const brandName = content.meta.brandName;
-  const footerDescription = content.footer.description;
-  const socialLinks = content.data.socialLinks;
-  const playStoreLink = content.data.playStoreLink;
 
   useEffect(() => {
     const onScroll = () => {
@@ -132,7 +113,7 @@ export default function Layout({ children, appValue }) {
               src="/logo.png"
               alt="Civil World logo"
             />
-            <span className="brand-text">{brandName}</span>
+            <span className="brand-text">Civil World</span>
           </NavLink>
 
           <button
@@ -173,21 +154,70 @@ export default function Layout({ children, appValue }) {
 
       <footer className="site-footer">
         <div className="container footer-grid">
-          <div className="footer-brand-block">
+          <div className="footer-col-card footer-brand-block">
             <div className="footer-brand-head">
               <img
                 className="footer-brand-logo"
                 src="/logo.png"
                 alt="Civil World logo"
               />
-              <h3>{brandName}</h3>
+              <h3>Civil World</h3>
             </div>
-            <p>{footerDescription}</p>
-            <Link className="admin-footer-link" to="/admin">
-              Admin Panel
-            </Link>
+            <p>
+              Haryana based teaching platform for Polytechnic and B.Tech
+              students with clear concepts, strategy, and exam-ready mentorship.
+            </p>
+            <p className="footer-note">
+              Guided by a Haryana board educator for practical learning,
+              semester progress, and career-focused support.
+            </p>
           </div>
-          <div>
+
+          <div className="footer-col-card">
+            <h4>Quick Access</h4>
+            <ul className="footer-link-list">
+              <li>
+                <NavLink to="/courses">Courses</NavLink>
+              </li>
+              <li>
+                <NavLink to="/resources">Resources</NavLink>
+              </li>
+              <li>
+                <NavLink to="/contact">Admissions</NavLink>
+              </li>
+              <li>
+                <NavLink to="/admin/resources">Admin Panel</NavLink>
+              </li>
+            </ul>
+          </div>
+
+          <div className="footer-col-card">
+            <h4>Student Help Desk</h4>
+            <ul className="footer-link-list">
+              <li>
+                <a
+                  href="https://hsbte.org.in/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  HSBTE Results & Notices
+                </a>
+              </li>
+              <li>
+                <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer">
+                  WhatsApp Support
+                </a>
+              </li>
+              <li>
+                <a href="mailto:civilworld.edu@example.com">civilworld.edu@example.com</a>
+              </li>
+              <li>
+                <span className="footer-plain-text">Mon-Sat: 8:00 AM - 8:00 PM</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="footer-col-card">
             <h4>Social Media</h4>
             <ul className="social-list">
               {socialLinks.map((item) => (
@@ -199,35 +229,38 @@ export default function Layout({ children, appValue }) {
                     className="social-link"
                     aria-label={item.name}
                   >
-                    <span className="social-icon">
-                      {getSocialIcon(item.name)}
-                    </span>
+                    <span className="social-icon">{getSocialIcon(item.name)}</span>
                     <span className="social-name">{item.name}</span>
                   </a>
                 </li>
               ))}
             </ul>
-          </div>
-          <div>
-            <div className="playstore-card">
-              <div className="playstore-header">
-                <span className="playstore-logo">
-                  <PlayStoreLogo />
-                </span>
-                <div>
-                  <h4>Open in Mobile App</h4>
-                  <p>Classes, notes, and materials in one place.</p>
-                </div>
-              </div>
-              <a
-                href={playStoreLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="playstore-link playstore-cta"
-              >
-                Get it on Google Play
-              </a>
-            </div>
+
+            <h4 className="footer-subheading">Mobile App</h4>
+            <a
+              href={playStoreLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="playstore-link app-link-card"
+            >
+              <img
+                className="android-app-logo"
+                src="/logo.png"
+                alt="Civil World Android app logo"
+              />
+              <span className="playstore-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M3 2.8v18.4c0 .7.7 1.1 1.3.8l10.8-9.2L4.3 2c-.6-.3-1.3.1-1.3.8Z" fill="#00d26a" />
+                  <path d="M15.1 12 19.6 8.2c.6-.5.4-1.5-.4-1.8L12.3 3.9 8 8.2 15.1 12Z" fill="#00a6ff" />
+                  <path d="m8 15.8 4.3 4.3 6.9-2.5c.8-.3 1-1.3.4-1.8L15.1 12 8 15.8Z" fill="#ff3f4d" />
+                  <path d="M8 8.2v7.6L15.1 12 8 8.2Z" fill="#ffd83d" />
+                </svg>
+              </span>
+              <span>
+                <strong>Android App</strong>
+                <small>Open on Google Play</small>
+              </span>
+            </a>
           </div>
         </div>
         <p className="copyright">

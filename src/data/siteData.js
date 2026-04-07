@@ -1,25 +1,22 @@
 export const socialLinks = [
   {
     name: "YouTube",
-    url: "https://youtube.com/@civilworld0312",
+    url: "https://www.youtube.com/results?search_query=civil+world+polytechnic+btech",
   },
-  {
-    name: "Instagram",
-    url: "https://www.instagram.com/civilworld__/",
-  },
-  { name: "Facebook", url: "https://www.facebook.com/share/1FtDrzpVWQ/" },
-  {
-    name: "WhatsApp",
-    url: "https://whatsapp.com/channel/0029VajQQ72FCCocQCajmh28",
-  },
+  { name: "Instagram", url: "https://www.instagram.com/" },
+  { name: "Facebook", url: "https://www.facebook.com/" },
+  { name: "X", url: "https://x.com/" },
+  { name: "Telegram", url: "https://t.me/" },
+  { name: "LinkedIn", url: "https://www.linkedin.com/" },
+  { name: "WhatsApp", url: "https://wa.me/919999999999" },
 ];
 
 export const playStoreLink =
-  "https://play.google.com/store/apps/details?id=co.lct.dbnsok";
+  "https://play.google.com/store/search?q=civil%20world%20polytechnic%20btech&c=apps";
 
 export const stats = [
   { label: "YouTube Subscribers", value: 34000, suffix: "+" },
-  { label: "School + B.Tech Students Mentored", value: 5000, suffix: "+" },
+  { label: "Students Mentored", value: 5000, suffix: "+" },
   { label: "Years Experience", value: 8, suffix: "+" },
   { label: "Satisfaction", value: 95, suffix: "%" },
 ];
@@ -32,17 +29,12 @@ export const testimonials = [
   },
   {
     quote:
-      "As a B.Tech student in Haryana, I finally understood political concepts and improved my semester scores.",
-    author: "Harsh, B.Tech Student",
-  },
-  {
-    quote:
       "The test series and feedback helped me improve speed and confidence before exams.",
     author: "Aman, Competitive Exam Aspirant",
   },
   {
     quote:
-      "Current affairs examples make political science interesting and easy to remember.",
+      "Real technical examples make engineering subjects interesting and easy to remember.",
     author: "Ravi, Undergraduate Student",
   },
 ];
@@ -67,33 +59,65 @@ export const faqItems = [
 
 export const courses = [
   {
-    title: "Foundation Batch (School + B.Tech)",
+    title: "B.Tech Foundation Batch",
     description:
-      "Complete chapter-wise teaching for board, university, and competitive learners in Haryana.",
+      "Complete concept-to-problem training for first-year and core-semester students.",
     tag: "Live + Recorded",
+    image: "/images/courses/btech_foundation_course_1775582976087.png",
   },
   {
-    title: "B.Tech Political Science Support",
+    title: "Diploma Semester Mastery",
     description:
-      "Targeted support for B.Tech students with semester-focused revision, notes, and answer strategy.",
-    tag: "Haryana Focused",
+      "Unit-wise teaching, important question sets, and rapid revision for diploma exams.",
+    tag: "Diploma Focus",
+    image: "/images/courses/diploma_mastery_course_1775582992494.png",
   },
   {
-    title: "Crash Course",
+    title: "Programming Essentials",
     description:
-      "Fast revision, high-yield notes, and smart answer framing strategy.",
-    tag: "Exam Focused",
+      "C, C++, Python, and logic-building sessions with practical coding tasks.",
+    tag: "Programming",
+    image: "/images/courses/programming_essentials_course_1775583010686.png",
   },
   {
-    title: "Test Series",
+    title: "Data Structures & Algorithms",
     description:
-      "Weekly mock tests, feedback analysis, and score improvement roadmap.",
+      "DSA from basics to interview-level patterns with weekly coding drills.",
+    tag: "Coding Interview",
+    image: "/images/courses/dsa_course_1775583027816.png",
+  },
+  {
+    title: "Web Development Track",
+    description:
+      "HTML, CSS, JavaScript, React basics, and mini-project based learning.",
+    tag: "Project Based",
+    image: "/images/courses/web_dev_course_1775583043139.png",
+  },
+  {
+    title: "DBMS + SQL Practical",
+    description:
+      "Database design, SQL queries, and exam-oriented practical preparation.",
+    tag: "Lab + Theory",
+    image: "/images/courses/dbms_sql_course_1775583062913.png",
+  },
+  {
+    title: "Engineering Mathematics Support",
+    description:
+      "Formula-first approach, solved examples, and previous year question practice.",
+    tag: "High Scoring",
+    image: "/images/courses/engineering_math_course_1775583080013.png",
+  },
+  {
+    title: "Test Series & Performance Review",
+    description:
+      "Weekly mock tests, mentor feedback, and score improvement roadmap.",
     tag: "Performance Driven",
+    image: "/images/courses/test_series_course_1775583096890.png",
   },
 ];
 
 export const resources = [
-  { title: "Political Theory Revision", topic: "theory" },
+  { title: "Engineering Fundamentals Revision", topic: "theory" },
   { title: "Indian Constitution Short Notes", topic: "constitution" },
   { title: "International Relations Map", topic: "relations" },
   { title: "Answer Writing Framework", topic: "practice" },

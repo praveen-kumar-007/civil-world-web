@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import { useContent } from "../context/ContentContext";
 
+const PRESET_RESOURCE_CATEGORIES = [
+  "B.Tech",
+  "Diploma",
+  "Programming",
+  "Others",
+];
+
 export default function AdminPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const {
     content,
     setContentFromAdmin,
@@ -23,16 +32,70 @@ export default function AdminPage() {
   const [editorValue, setEditorValue] = useState(() =>
     JSON.stringify(content, null, 2),
   );
-  const [activePanel, setActivePanel] = useState("inbox");
+  const [resourceHeading, setResourceHeading] = useState(
+    () => content?.home?.freeResources?.heading || "Free Resources",
+  );
+  const [resourceTitle, setResourceTitle] = useState("");
+  const [resourceLink, setResourceLink] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("B.Tech");
+  const [newCategory, setNewCategory] = useState("");
+  const [youtubeLink, setYoutubeLink] = useState("");
+  const [isSavingResource, setIsSavingResource] = useState(false);
   const [enquiryFilter, setEnquiryFilter] = useState("all");
   const [contactInbox, setContactInbox] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(
     () => localStorage.getItem(adminSessionKey) === "ok",
   );
 
+  const freeResources = Array.isArray(content?.home?.freeResources?.items)
+    ? content.home.freeResources.items
+    : [];
+
+  const resourceCategories =
+    Array.isArray(content?.home?.freeResources?.categories) &&
+    content.home.freeResources.categories.length > 0
+      ? content.home.freeResources.categories
+      : PRESET_RESOURCE_CATEGORIES;
+
+  const youtubeResources = Array.isArray(
+    content?.home?.freeResources?.youtubeLinks,
+  )
+    ? content.home.freeResources.youtubeLinks
+    : [];
+
+  const pathSegment = location.pathname.split("/")[2] || "";
+  const adminSection =
+    pathSegment === "contacts" ||
+    pathSegment === "resources" ||
+    pathSegment === "videos" ||
+    pathSegment === "content"
+      ? pathSegment
+      : "contacts";
+
   useEffect(() => {
     setEditorValue(JSON.stringify(content, null, 2));
+    setResourceHeading(
+      content?.home?.freeResources?.heading || "Free Resources",
+    );
+    setSelectedCategory(
+      Array.isArray(content?.home?.freeResources?.categories) &&
+        content.home.freeResources.categories[0]
+        ? content.home.freeResources.categories[0]
+        : PRESET_RESOURCE_CATEGORIES[0],
+    );
   }, [content]);
+
+  useEffect(() => {
+    if (location.pathname === "/admin") {
+      navigate("/admin/contacts", { replace: true });
+      return;
+    }
+
+    const panel = new URLSearchParams(location.search).get("panel");
+    if (panel === "resources") {
+      navigate("/admin/resources", { replace: true });
+    }
+  }, [location.pathname, location.search, navigate]);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -117,6 +180,213 @@ export default function AdminPage() {
     }
   }
 
+  function setFreeResources({
+    nextItems = freeResources,
+    heading = resourceHeading,
+    categories = resourceCategories,
+    youtubeLinks = youtubeResources,
+  }) {
+    const nextContent = {
+      ...content,
+      home: {
+        ...content.home,
+        freeResources: {
+          ...content.home?.freeResources,
+          heading: heading.trim() || "Free Resources",
+          categories,
+          youtubeLinks,
+          items: nextItems,
+        },
+      },
+    };
+
+    setContentFromAdmin(nextContent);
+  }
+
+  function handleSaveHeading() {
+    setFreeResources({ heading: resourceHeading });
+    setStatus("Free resources heading updated.");
+  }
+
+  function handleAddCategory() {
+    const category = newCategory.trim();
+    if (!category) {
+      setStatus("Please enter a filter name.");
+      return;
+    }
+
+    const exists = resourceCategories.some(
+      (item) => item.toLowerCase() === category.toLowerCase(),
+    );
+
+    if (exists) {
+      setStatus("This filter already exists.");
+      return;
+    }
+
+    const nextCategories = [...resourceCategories, category];
+    setFreeResources({ categories: nextCategories });
+    setSelectedCategory(category);
+    setNewCategory("");
+    setStatus("New filter created successfully.");
+  }
+
+  function handleDeleteCategory(categoryToDelete) {
+    const remaining = resourceCategories.filter(
+      (item) => item !== categoryToDelete,
+    );
+
+    const nextCategories =
+      remaining.length > 0 ? remaining : [PRESET_RESOURCE_CATEGORIES[3]];
+
+    const fallbackCategory = nextCategories.includes("Others")
+      ? "Others"
+      : nextCategories[0];
+
+    const nextItems = freeResources.map((item) =>
+      item.category === categoryToDelete
+        ? { ...item, category: fallbackCategory }
+        : item,
+    );
+
+    setFreeResources({ nextItems, categories: nextCategories });
+    setSelectedCategory((current) =>
+      current === categoryToDelete ? fallbackCategory : current,
+    );
+    setStatus(`Filter "${categoryToDelete}" removed.`);
+  }
+
+  async function handleAddFreeResource(event) {
+    event.preventDefault();
+
+    const title = resourceTitle.trim();
+    const link = resourceLink.trim();
+    if (!title) {
+      setStatus("Please enter a heading/title for the free resource.");
+      return;
+    }
+
+    if (!link) {
+      setStatus("Please provide a Google Drive link.");
+      return;
+    }
+
+    setIsSavingResource(true);
+
+    try {
+      let parsedUrl;
+      try {
+        parsedUrl = new URL(link);
+      } catch {
+        setStatus("Please enter a valid Google Drive link.");
+        setIsSavingResource(false);
+        return;
+      }
+
+      const host = parsedUrl.hostname.toLowerCase();
+      const isDriveLink =
+        host.includes("drive.google.com") || host.includes("docs.google.com");
+
+      if (!isDriveLink) {
+        setStatus("Only Google Drive links are allowed.");
+        setIsSavingResource(false);
+        return;
+      }
+
+      const nextItems = [
+        {
+          id:
+            typeof crypto !== "undefined" &&
+            typeof crypto.randomUUID === "function"
+              ? crypto.randomUUID()
+              : String(Date.now()),
+          title,
+          url: link,
+          category: selectedCategory,
+          createdAt: new Date().toISOString(),
+        },
+        ...freeResources,
+      ];
+
+      setFreeResources({ nextItems });
+      setResourceTitle("");
+      setResourceLink("");
+      setStatus("Drive link added and published successfully.");
+    } catch {
+      setStatus("Could not add drive link. Please try again.");
+    } finally {
+      setIsSavingResource(false);
+    }
+  }
+
+  function handleDeleteFreeResource(resourceToDelete) {
+    const nextItems = freeResources.filter((item) => {
+      const sameId = resourceToDelete?.id && item?.id === resourceToDelete.id;
+      const sameUrl =
+        resourceToDelete?.url && item?.url === resourceToDelete.url;
+      const sameTitle =
+        resourceToDelete?.title && item?.title === resourceToDelete.title;
+      return !(sameId || (sameUrl && sameTitle));
+    });
+
+    setFreeResources({ nextItems });
+    setStatus("Resource entry deleted.");
+  }
+
+  function handleClearAllResources() {
+    setFreeResources({ nextItems: [] });
+    setStatus("All resource entries deleted.");
+  }
+
+  function handleAddYoutubeLink(event) {
+    event.preventDefault();
+
+    const url = youtubeLink.trim();
+
+    if (!url) {
+      setStatus("Please enter a YouTube link.");
+      return;
+    }
+
+    let parsedUrl;
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      setStatus("Please enter a valid YouTube URL.");
+      return;
+    }
+
+    const host = parsedUrl.hostname.toLowerCase();
+    const isYoutube = host.includes("youtube.com") || host.includes("youtu.be");
+
+    if (!isYoutube) {
+      setStatus("Only YouTube links are allowed here.");
+      return;
+    }
+
+    const nextYoutube = [
+      {
+        id:
+          typeof crypto !== "undefined" &&
+          typeof crypto.randomUUID === "function"
+            ? crypto.randomUUID()
+            : `yt-${Date.now()}`,
+        url,
+      },
+      ...youtubeResources,
+    ];
+
+    setFreeResources({ youtubeLinks: nextYoutube });
+    setYoutubeLink("");
+    setStatus("YouTube learning frame added.");
+  }
+
+  function handleDeleteYoutubeLink(videoId) {
+    const nextYoutube = youtubeResources.filter((item) => item.id !== videoId);
+    setFreeResources({ youtubeLinks: nextYoutube });
+    setStatus("YouTube link removed.");
+  }
+
   function handleReset() {
     if (resetPhrase !== "RESET") {
       setStatus("Type RESET to clear saved content.");
@@ -189,16 +459,16 @@ export default function AdminPage() {
     <>
       <PageHero
         eyebrow="Admin"
-        title="Full Website Content Manager"
-        subtitle="Edit JSON, save, and publish content changes without backend."
+        title="Professional Admin Workspace"
+        subtitle="Manage contacts, resources, and videos from dedicated admin pages."
       />
 
       <section className="container admin-panel-grid">
         <aside className="admin-overview-card">
           <h3>Dashboard</h3>
           <p>
-            Track contact activity and manage live website content from one
-            place.
+            Navigate dedicated admin pages for contacts, resources, and video
+            content.
           </p>
 
           <div
@@ -211,38 +481,40 @@ export default function AdminPage() {
               <span>Total enquiries</span>
             </article>
             <article role="listitem" className="admin-metric-item">
-              <strong>{newEnquiries}</strong>
-              <span>New enquiries</span>
+              <strong>{freeResources.length}</strong>
+              <span>Drive resources</span>
             </article>
             <article role="listitem" className="admin-metric-item">
-              <strong>{readEnquiries}</strong>
-              <span>Reviewed enquiries</span>
+              <strong>{youtubeResources.length}</strong>
+              <span>YouTube links</span>
             </article>
           </div>
 
-          <div
-            className="admin-panel-switch"
-            role="tablist"
-            aria-label="Admin sections"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activePanel === "inbox"}
-              className={`admin-switch-btn ${activePanel === "inbox" ? "active" : ""}`}
-              onClick={() => setActivePanel("inbox")}
+          <div className="admin-panel-switch" aria-label="Admin sections">
+            <Link
+              className={`admin-switch-link ${adminSection === "contacts" ? "active" : ""}`}
+              to="/admin/contacts"
             >
-              Contact Inbox
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activePanel === "content"}
-              className={`admin-switch-btn ${activePanel === "content" ? "active" : ""}`}
-              onClick={() => setActivePanel("content")}
+              Contact Page
+            </Link>
+            <Link
+              className={`admin-switch-link ${adminSection === "resources" ? "active" : ""}`}
+              to="/admin/resources"
+            >
+              Resource Page
+            </Link>
+            <Link
+              className={`admin-switch-link ${adminSection === "videos" ? "active" : ""}`}
+              to="/admin/videos"
+            >
+              Video Page
+            </Link>
+            <Link
+              className={`admin-switch-link ${adminSection === "content" ? "active" : ""}`}
+              to="/admin/content"
             >
               Content JSON
-            </button>
+            </Link>
           </div>
 
           <div className="admin-actions">
@@ -260,28 +532,28 @@ export default function AdminPage() {
           <p className="status-text">{status}</p>
         </aside>
 
-        {activePanel === "inbox" ? (
+        {adminSection === "contacts" ? (
           <article className="admin-editor-card">
             <div className="admin-editor-top">
-              <h3>Who is trying to contact</h3>
+              <h3>Contact Page Entries</h3>
               <div className="admin-actions">
                 <button
                   type="button"
-                  className="btn btn-outline"
+                  className={`btn btn-outline ${enquiryFilter === "all" ? "admin-filter-active" : ""}`}
                   onClick={() => setEnquiryFilter("all")}
                 >
                   All
                 </button>
                 <button
                   type="button"
-                  className="btn btn-outline"
+                  className={`btn btn-outline ${enquiryFilter === "new" ? "admin-filter-active" : ""}`}
                   onClick={() => setEnquiryFilter("new")}
                 >
                   New
                 </button>
                 <button
                   type="button"
-                  className="btn btn-outline"
+                  className={`btn btn-outline ${enquiryFilter === "read" ? "admin-filter-active" : ""}`}
                   onClick={() => setEnquiryFilter("read")}
                 >
                   Reviewed
@@ -359,7 +631,7 @@ export default function AdminPage() {
               </div>
             )}
           </article>
-        ) : (
+        ) : adminSection === "content" ? (
           <article className="admin-editor-card">
             <div className="admin-editor-top">
               <h3>Content JSON</h3>
@@ -388,6 +660,230 @@ export default function AdminPage() {
               onChange={(event) => setEditorValue(event.target.value)}
               spellCheck="false"
             />
+          </article>
+        ) : adminSection === "resources" ? (
+          <article className="admin-editor-card">
+            <div className="admin-editor-top">
+              <h3>Resource Page Manager</h3>
+              <div className="admin-actions">
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={handleClearAllResources}
+                  disabled={freeResources.length === 0}
+                >
+                  Delete All Entries
+                </button>
+              </div>
+            </div>
+
+            <div className="admin-resource-heading">
+              <label>
+                Section Heading
+                <input
+                  type="text"
+                  value={resourceHeading}
+                  onChange={(event) => setResourceHeading(event.target.value)}
+                  placeholder="Free Resources"
+                />
+              </label>
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={handleSaveHeading}
+              >
+                Save Heading
+              </button>
+            </div>
+
+            <form
+              className="admin-resource-form"
+              onSubmit={handleAddFreeResource}
+            >
+              <label>
+                Resource Category
+                <select
+                  value={selectedCategory}
+                  onChange={(event) => setSelectedCategory(event.target.value)}
+                >
+                  {resourceCategories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Resource Title
+                <input
+                  type="text"
+                  value={resourceTitle}
+                  onChange={(event) => setResourceTitle(event.target.value)}
+                  placeholder="e.g. Network Theory Notes"
+                  required
+                />
+              </label>
+              <label>
+                Google Drive Link
+                <input
+                  type="url"
+                  value={resourceLink}
+                  onChange={(event) => setResourceLink(event.target.value)}
+                  placeholder="https://drive.google.com/file/d/.../view"
+                  required
+                />
+              </label>
+              <p className="admin-upload-hint">
+                Only Google Drive links are allowed.
+              </p>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={isSavingResource}
+              >
+                {isSavingResource ? "Saving..." : "Add Drive Resource"}
+              </button>
+            </form>
+
+            <div className="admin-resource-heading">
+              <label>
+                Create New Filter
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={(event) => setNewCategory(event.target.value)}
+                  placeholder="e.g. Civil Engineering"
+                />
+              </label>
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={handleAddCategory}
+              >
+                Add Filter
+              </button>
+            </div>
+
+            <div className="admin-filter-chip-row">
+              {resourceCategories.map((category) => (
+                <div key={category} className="admin-filter-chip">
+                  <span>{category}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteCategory(category)}
+                    aria-label={`Delete ${category} filter`}
+                  >
+                    x
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="admin-resource-list">
+              {freeResources.length === 0 ? (
+                <p className="admin-empty-inbox">
+                  No free resources uploaded yet.
+                </p>
+              ) : (
+                freeResources.map((item) => (
+                  <article
+                    key={item.id || item.title}
+                    className="admin-enquiry-item read"
+                  >
+                    <header>
+                      <h4>{item.title || "Untitled"}</h4>
+                      <span>
+                        {item.createdAt
+                          ? new Date(item.createdAt).toLocaleString()
+                          : "No date"}
+                      </span>
+                    </header>
+                    <p>
+                      <strong>Category:</strong> {item.category || "Others"}
+                    </p>
+                    <p>
+                      <strong>Drive Link:</strong> {item.url || "-"}
+                    </p>
+                    <div className="admin-actions">
+                      <a
+                        className="btn btn-outline"
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Open
+                      </a>
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={() => handleDeleteFreeResource(item)}
+                      >
+                        Delete Entry
+                      </button>
+                    </div>
+                  </article>
+                ))
+              )}
+            </div>
+          </article>
+        ) : (
+          <article className="admin-editor-card">
+            <div className="admin-editor-top">
+              <h3>Video Page Manager</h3>
+            </div>
+
+            <form
+              className="admin-resource-form"
+              onSubmit={handleAddYoutubeLink}
+            >
+              <h4>Add YouTube Learning Frame</h4>
+              <label>
+                YouTube Link
+                <input
+                  type="url"
+                  value={youtubeLink}
+                  onChange={(event) => setYoutubeLink(event.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                />
+              </label>
+              <button type="submit" className="btn btn-primary">
+                Add YouTube Frame
+              </button>
+            </form>
+
+            <div className="admin-resource-list">
+              {youtubeResources.length === 0 ? (
+                <p className="admin-empty-inbox">No YouTube links added yet.</p>
+              ) : (
+                youtubeResources.map((video) => (
+                  <article key={video.id} className="admin-enquiry-item read">
+                    <header>
+                      <h4>{video.title || "YouTube Video"}</h4>
+                    </header>
+                    <p>
+                      <strong>YouTube:</strong> {video.url}
+                    </p>
+                    <div className="admin-actions">
+                      <a
+                        className="btn btn-outline"
+                        href={video.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Open
+                      </a>
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={() => handleDeleteYoutubeLink(video.id)}
+                      >
+                        Delete Entry
+                      </button>
+                    </div>
+                  </article>
+                ))
+              )}
+            </div>
           </article>
         )}
 

@@ -41,11 +41,29 @@ function loadStoredContent() {
 
     const parsed = JSON.parse(raw);
     const merged = deepMerge(defaultContent, parsed);
+    const requestedYoutubeLinks = [
+      {
+        id: "yt-res-1",
+        url: "https://youtu.be/E-qCrzcvPbM?si=83_mb2JBMlSsWTIe",
+      },
+      {
+        id: "yt-res-2",
+        url: "https://youtu.be/ZCypdX6wf-I?si=hZgn51MfJIfvM3nq",
+      },
+    ];
 
-    // Migrate older stored home text so frontend shows updated B.Tech messaging.
+    // Migrate older stored home text so frontend shows updated Polytechnic + B.Tech messaging.
     if (merged.home.titleTemplate === "Master Political Science with {word}.") {
       merged.home.titleTemplate =
-        "Master Political Science and all B.Tech subjects with {word}.";
+        "Master Polytechnic and B.Tech subjects with {word}.";
+    }
+
+    if (
+      merged.home.titleTemplate ===
+      "Master Political Science and all B.Tech subjects with {word}."
+    ) {
+      merged.home.titleTemplate =
+        "Master Polytechnic and B.Tech subjects with {word}.";
     }
 
     if (
@@ -53,12 +71,24 @@ function loadStoredContent() {
       "Visual learning systems, live mentoring, and exam-ready training for school, competitive, and B.Tech students in Haryana."
     ) {
       merged.home.subtitle =
-        "Visual learning systems, live mentoring, and exam-ready training for school, competitive, and B.Tech students across all major subjects in Haryana.";
+        "Visual learning systems, live mentoring, and exam-ready training for Polytechnic and B.Tech students across major engineering subjects in Haryana.";
+    }
+
+    if (
+      merged.home.subtitle ===
+      "Visual learning systems, live mentoring, and exam-ready training for school, competitive, and B.Tech students across all major subjects in Haryana."
+    ) {
+      merged.home.subtitle =
+        "Visual learning systems, live mentoring, and exam-ready training for Polytechnic and B.Tech students across major engineering subjects in Haryana.";
     }
 
     if (Array.isArray(merged.home.heroBadges)) {
       merged.home.heroBadges = merged.home.heroBadges.map((badge) =>
-        badge === "B.Tech Support in Haryana" ? "All B.Tech Subjects" : badge,
+        badge === "B.Tech Support in Haryana"
+          ? "Polytechnic + B.Tech Subjects"
+          : badge === "All B.Tech Subjects"
+            ? "Polytechnic + B.Tech Subjects"
+            : badge,
       );
     }
 
@@ -69,7 +99,10 @@ function loadStoredContent() {
           return { ...item, value: 34000, suffix: "+" };
         }
 
-        if (item?.label === "School + B.Tech Students Mentored") {
+        if (
+          item?.label === "School + B.Tech Students Mentored" ||
+          item?.label === "Polytechnic + B.Tech Students Mentored"
+        ) {
           return { ...item, value: 5000, suffix: "+" };
         }
 
@@ -86,12 +119,28 @@ function loadStoredContent() {
     }
 
     if (Array.isArray(merged.about?.profileHighlights)) {
-      merged.about.profileHighlights = merged.about.profileHighlights.map((item) => {
-        if (item?.subtitle === "YouTube Learners") {
-          return { ...item, title: "34K+" };
-        }
-        return item;
-      });
+      merged.about.profileHighlights = merged.about.profileHighlights.map(
+        (item) => {
+          if (item?.subtitle === "YouTube Learners") {
+            return { ...item, title: "34K+" };
+          }
+          return item;
+        },
+      );
+    }
+
+    if (!Array.isArray(merged.home?.freeResources?.youtubeLinks)) {
+      merged.home.freeResources.youtubeLinks = requestedYoutubeLinks;
+    } else {
+      const urls = merged.home.freeResources.youtubeLinks.map((item) => item?.url);
+      const hasLegacyDefault = urls.includes("https://www.youtube.com/watch?v=rfscVS0vtbw");
+      const hasRequestedLinks =
+        urls.includes("https://youtu.be/E-qCrzcvPbM?si=83_mb2JBMlSsWTIe") ||
+        urls.includes("https://youtu.be/ZCypdX6wf-I?si=hZgn51MfJIfvM3nq");
+
+      if (hasLegacyDefault && !hasRequestedLinks) {
+        merged.home.freeResources.youtubeLinks = requestedYoutubeLinks;
+      }
     }
 
     return merged;
