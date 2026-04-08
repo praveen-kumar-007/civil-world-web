@@ -1,7 +1,7 @@
 export const socialLinks = [
   {
     name: "YouTube",
-    url: "https://www.youtube.com/results?search_query=civil+world+polytechnic+btech",
+    url: "https://www.youtube.com/results?search_query=civil+world+political+science",
   },
   { name: "Instagram", url: "https://www.instagram.com/" },
   { name: "Facebook", url: "https://www.facebook.com/" },
@@ -12,7 +12,7 @@ export const socialLinks = [
 ];
 
 export const playStoreLink =
-  "https://play.google.com/store/search?q=civil%20world%20polytechnic%20btech&c=apps";
+  "https://play.google.com/store/search?q=civil%20world%20political%20science&c=apps";
 
 export const stats = [
   { label: "YouTube Subscribers", value: 34000, suffix: "+" },
@@ -34,7 +34,7 @@ export const testimonials = [
   },
   {
     quote:
-      "Real technical examples make engineering subjects interesting and easy to remember.",
+      "Current affairs examples make political science interesting and easy to remember.",
     author: "Ravi, Undergraduate Student",
   },
 ];
@@ -59,65 +59,27 @@ export const faqItems = [
 
 export const courses = [
   {
-    title: "B.Tech Foundation Batch",
+    title: "Foundation Batch",
     description:
-      "Complete concept-to-problem training for first-year and core-semester students.",
+      "Complete chapter-wise teaching for board and competitive learners.",
     tag: "Live + Recorded",
-    image: "/images/courses/btech_foundation_course_1775582976087.png",
   },
   {
-    title: "Diploma Semester Mastery",
+    title: "Crash Course",
     description:
-      "Unit-wise teaching, important question sets, and rapid revision for diploma exams.",
-    tag: "Diploma Focus",
-    image: "/images/courses/diploma_mastery_course_1775582992494.png",
+      "Fast revision, high-yield notes, and smart answer framing strategy.",
+    tag: "Exam Focused",
   },
   {
-    title: "Programming Essentials",
+    title: "Test Series",
     description:
-      "C, C++, Python, and logic-building sessions with practical coding tasks.",
-    tag: "Programming",
-    image: "/images/courses/programming_essentials_course_1775583010686.png",
-  },
-  {
-    title: "Data Structures & Algorithms",
-    description:
-      "DSA from basics to interview-level patterns with weekly coding drills.",
-    tag: "Coding Interview",
-    image: "/images/courses/dsa_course_1775583027816.png",
-  },
-  {
-    title: "Web Development Track",
-    description:
-      "HTML, CSS, JavaScript, React basics, and mini-project based learning.",
-    tag: "Project Based",
-    image: "/images/courses/web_dev_course_1775583043139.png",
-  },
-  {
-    title: "DBMS + SQL Practical",
-    description:
-      "Database design, SQL queries, and exam-oriented practical preparation.",
-    tag: "Lab + Theory",
-    image: "/images/courses/dbms_sql_course_1775583062913.png",
-  },
-  {
-    title: "Engineering Mathematics Support",
-    description:
-      "Formula-first approach, solved examples, and previous year question practice.",
-    tag: "High Scoring",
-    image: "/images/courses/engineering_math_course_1775583080013.png",
-  },
-  {
-    title: "Test Series & Performance Review",
-    description:
-      "Weekly mock tests, mentor feedback, and score improvement roadmap.",
+      "Weekly mock tests, feedback analysis, and score improvement roadmap.",
     tag: "Performance Driven",
-    image: "/images/courses/test_series_course_1775583096890.png",
   },
 ];
 
 export const resources = [
-  { title: "Engineering Fundamentals Revision", topic: "theory" },
+  { title: "Political Theory Revision", topic: "theory" },
   { title: "Indian Constitution Short Notes", topic: "constitution" },
   { title: "International Relations Map", topic: "relations" },
   { title: "Answer Writing Framework", topic: "practice" },

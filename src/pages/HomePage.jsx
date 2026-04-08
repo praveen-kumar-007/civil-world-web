@@ -3,29 +3,22 @@ import { Link } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import EducationalModel from "../components/EducationalModel";
 import { faqItems, stats, testimonials } from "../data/siteData";
-import { useContent } from "../context/ContentContext";
 
 const typedWords = ["clarity", "strategy", "confidence", "high scores"];
 const updates = [
   "New Batch Starts Monday",
   "Live Doubt Solving Every Saturday",
-  "Free Engineering Workshop This Week",
+  "Free Political Theory Workshop This Week",
   "34K+ YouTube Learning Community",
-  "Diploma + Engineering Exam Strategy Sessions",
+  "Board + Competitive Exam Strategy Sessions",
 ];
 
 export default function HomePage() {
-  const { content } = useContent();
   const [activeSlide, setActiveSlide] = useState(0);
   const [activeFaq, setActiveFaq] = useState(-1);
   const [wordIndex, setWordIndex] = useState(0);
   const [newsletterMessage, setNewsletterMessage] = useState("");
   const [displayStats, setDisplayStats] = useState(stats.map(() => 0));
-
-  const freeResources = content?.home?.freeResources;
-  const freeResourceItems = Array.isArray(freeResources?.items)
-    ? freeResources.items
-    : [];
 
   const pageCards = useMemo(
     () => [
@@ -87,16 +80,16 @@ export default function HomePage() {
       </section>
 
       <PageHero
-        eyebrow="Haryana's Trusted Polytechnic and B.Tech Mentor"
-        title={`Master Polytechnic and B.Tech subjects with ${typedWords[wordIndex]}.`}
-        subtitle="Civil World delivers concept-first teaching, practical problem-solving strategy, and exam-ready training."
+        eyebrow="Haryana's Trusted Political Science Mentor"
+        title={`Master Political Science with ${typedWords[wordIndex]}.`}
+        subtitle="Civil World delivers concept-first teaching, practical answer writing strategy, and exam-ready training."
       >
         <div className="hero-layout">
           <div>
             <div className="hero-cta">
               <a
                 className="btn btn-primary"
-                href="https://www.youtube.com/results?search_query=civil+world+polytechnic+btech"
+                href="https://www.youtube.com/results?search_query=civil+world+political+science"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -107,12 +100,6 @@ export default function HomePage() {
               </Link>
               <Link className="btn btn-outline" to="/contact">
                 Join Next Batch
-              </Link>
-              <a className="btn btn-outline" href="#free-resources">
-                Free Resources
-              </a>
-              <Link className="btn btn-outline" to="/admin/resources">
-                Admin Access
               </Link>
             </div>
 
@@ -169,7 +156,7 @@ export default function HomePage() {
           <article className="feature-card">
             <h3>Current Affairs Integration</h3>
             <p>
-              Dynamic examples from real technical use-cases make concepts
+              Dynamic examples from latest events make Political Science
               practical and memorable.
             </p>
           </article>
@@ -209,92 +196,6 @@ export default function HomePage() {
           <p>Test Series</p>
           <p>Mentor Feedback</p>
           <p>Career Guidance</p>
-        </div>
-      </section>
-
-      <section className="container hsbte-desk" aria-label="HSBTE Board Desk">
-        <article className="hsbte-card">
-          <div className="hsbte-head">
-            <img
-              src="https://hsbte.org.in/assets/img/logo/HSBTEb2.png"
-              alt="HSBTE logo"
-              className="hsbte-logo"
-              loading="lazy"
-            />
-            <div>
-              <p className="eyebrow">Haryana Board Desk</p>
-              <h2>HSBTE Student Result & Notice Access</h2>
-            </div>
-          </div>
-
-          <p>
-            As a teacher from Haryana Board, I have added this quick board desk
-            so students can directly visit HSBTE for latest results, notices,
-            and official updates.
-          </p>
-
-          <div className="hero-cta">
-            <a
-              className="btn btn-primary"
-              href="https://hsbte.org.in/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Open HSBTE Portal
-            </a>
-            <a
-              className="btn btn-outline"
-              href="https://hsbte.org.in/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Check Results & Notices
-            </a>
-          </div>
-        </article>
-      </section>
-
-      <section className="container" id="free-resources">
-        <div className="section-head">
-          <p className="eyebrow">Free Download Zone</p>
-          <h2>{freeResources?.heading || "Free Resources"}</h2>
-          <p>
-            {freeResources?.subtitle ||
-              "Access free learning files uploaded by the mentor."}
-          </p>
-        </div>
-
-        <div className="resources-grid">
-          {freeResourceItems.length === 0 ? (
-            <article className="resource-item">
-              <h3>No free resources uploaded yet</h3>
-              <p>Please check again soon.</p>
-            </article>
-          ) : (
-            freeResourceItems.map((item) => (
-              <article key={item.id || item.title} className="resource-item">
-                <h3>
-                  <a
-                    className="resource-heading-link"
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {item.title || "Free Resource"}
-                  </a>
-                </h3>
-                <p>Google Drive Resource</p>
-                <a
-                  className="btn btn-primary"
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Open Drive Link
-                </a>
-              </article>
-            ))
-          )}
         </div>
       </section>
 
@@ -399,7 +300,7 @@ export default function HomePage() {
 
       <section className="container cta-pro">
         <div className="cta-pro-card">
-          <h2>Ready to level up your Polytechnic and B.Tech preparation?</h2>
+          <h2>Ready to level up your Political Science preparation?</h2>
           <p>
             Start with structured mentorship, practice systems, and smart exam
             strategy.

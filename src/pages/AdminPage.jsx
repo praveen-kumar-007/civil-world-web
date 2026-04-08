@@ -15,10 +15,10 @@ export default function AdminPage() {
   const navigate = useNavigate();
   const {
     content,
-    setContentFromAdmin,
+    saveContentToServer,
+    isHydratingContent,
     resetContentFromAdmin,
     adminSessionKey,
-    contactInboxKey,
   } = useContent();
 
   const adminId = import.meta.env.VITE_ADMIN_ID;
@@ -102,14 +102,20 @@ export default function AdminPage() {
       return;
     }
 
-    try {
-      const raw = localStorage.getItem(contactInboxKey) || "[]";
-      const parsed = JSON.parse(raw);
-      setContactInbox(Array.isArray(parsed) ? parsed : []);
-    } catch {
-      setContactInbox([]);
+    async function loadInbox() {
+      const response = await fetch("/api/contacts");
+      if (!response.ok) {
+        throw new Error("Server inbox request failed");
+      }
+      const payload = await response.json();
+      setContactInbox(Array.isArray(payload?.items) ? payload.items : []);
     }
-  }, [contactInboxKey, isLoggedIn]);
+
+    loadInbox().catch(() => {
+      setStatus("Could not load contacts from server.");
+      setContactInbox([]);
+    });
+  }, [isLoggedIn]);
 
   const totalEnquiries = contactInbox.length;
   const newEnquiries = contactInbox.filter(
@@ -127,25 +133,45 @@ export default function AdminPage() {
     return true;
   });
 
-  function persistInbox(nextInbox) {
+  async function persistInbox(nextInbox) {
     setContactInbox(nextInbox);
-    localStorage.setItem(contactInboxKey, JSON.stringify(nextInbox));
   }
 
-  function markAsRead(id) {
+  async function markAsRead(id) {
     const nextInbox = contactInbox.map((item) =>
       item.id === id ? { ...item, status: "read" } : item,
     );
-    persistInbox(nextInbox);
+    await persistInbox(nextInbox);
+    const response = await fetch("/api/contacts", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status: "read" }),
+    });
+    if (!response.ok) {
+      setStatus("Could not update enquiry status on server.");
+    }
   }
 
-  function deleteEnquiry(id) {
+  async function deleteEnquiry(id) {
     const nextInbox = contactInbox.filter((item) => item.id !== id);
-    persistInbox(nextInbox);
+    await persistInbox(nextInbox);
+    const response = await fetch("/api/contacts", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (!response.ok) {
+      setStatus("Could not delete enquiry on server.");
+    }
   }
 
-  function clearAllEnquiries() {
-    persistInbox([]);
+  async function clearAllEnquiries() {
+    await persistInbox([]);
+    const response = await fetch("/api/contacts", { method: "DELETE" });
+    if (!response.ok) {
+      setStatus("Could not clear enquiries on server.");
+      return;
+    }
     setStatus("All contact enquiries were cleared.");
   }
 
@@ -170,17 +196,24 @@ export default function AdminPage() {
     setPassword("");
   }
 
-  function handleSave() {
+  async function handleSave() {
+    let parsed;
     try {
-      const parsed = JSON.parse(editorValue);
-      setContentFromAdmin(parsed);
-      setStatus("Content saved. Changes persist after refresh.");
+      parsed = JSON.parse(editorValue);
     } catch {
       setStatus("Invalid JSON. Please fix format before saving.");
+      return;
+    }
+
+    try {
+      await saveContentToServer(parsed);
+      setStatus("Content saved. Changes persist after refresh.");
+    } catch {
+      setStatus("Could not save content to MongoDB.");
     }
   }
 
-  function setFreeResources({
+  async function setFreeResources({
     nextItems = freeResources,
     heading = resourceHeading,
     categories = resourceCategories,
@@ -200,15 +233,19 @@ export default function AdminPage() {
       },
     };
 
-    setContentFromAdmin(nextContent);
+    try {
+      await saveContentToServer(nextContent);
+    } catch {
+      setStatus("Could not save changes to MongoDB.");
+    }
   }
 
-  function handleSaveHeading() {
-    setFreeResources({ heading: resourceHeading });
+  async function handleSaveHeading() {
+    await setFreeResources({ heading: resourceHeading });
     setStatus("Free resources heading updated.");
   }
 
-  function handleAddCategory() {
+  async function handleAddCategory() {
     const category = newCategory.trim();
     if (!category) {
       setStatus("Please enter a filter name.");
@@ -225,13 +262,13 @@ export default function AdminPage() {
     }
 
     const nextCategories = [...resourceCategories, category];
-    setFreeResources({ categories: nextCategories });
+    await setFreeResources({ categories: nextCategories });
     setSelectedCategory(category);
     setNewCategory("");
     setStatus("New filter created successfully.");
   }
 
-  function handleDeleteCategory(categoryToDelete) {
+  async function handleDeleteCategory(categoryToDelete) {
     const remaining = resourceCategories.filter(
       (item) => item !== categoryToDelete,
     );
@@ -249,7 +286,7 @@ export default function AdminPage() {
         : item,
     );
 
-    setFreeResources({ nextItems, categories: nextCategories });
+    await setFreeResources({ nextItems, categories: nextCategories });
     setSelectedCategory((current) =>
       current === categoryToDelete ? fallbackCategory : current,
     );
@@ -319,7 +356,7 @@ export default function AdminPage() {
     }
   }
 
-  function handleDeleteFreeResource(resourceToDelete) {
+  async function handleDeleteFreeResource(resourceToDelete) {
     const nextItems = freeResources.filter((item) => {
       const sameId = resourceToDelete?.id && item?.id === resourceToDelete.id;
       const sameUrl =
@@ -329,16 +366,16 @@ export default function AdminPage() {
       return !(sameId || (sameUrl && sameTitle));
     });
 
-    setFreeResources({ nextItems });
+    await setFreeResources({ nextItems });
     setStatus("Resource entry deleted.");
   }
 
-  function handleClearAllResources() {
-    setFreeResources({ nextItems: [] });
+  async function handleClearAllResources() {
+    await setFreeResources({ nextItems: [] });
     setStatus("All resource entries deleted.");
   }
 
-  function handleAddYoutubeLink(event) {
+  async function handleAddYoutubeLink(event) {
     event.preventDefault();
 
     const url = youtubeLink.trim();
@@ -376,26 +413,30 @@ export default function AdminPage() {
       ...youtubeResources,
     ];
 
-    setFreeResources({ youtubeLinks: nextYoutube });
+    await setFreeResources({ youtubeLinks: nextYoutube });
     setYoutubeLink("");
     setStatus("YouTube learning frame added.");
   }
 
-  function handleDeleteYoutubeLink(videoId) {
+  async function handleDeleteYoutubeLink(videoId) {
     const nextYoutube = youtubeResources.filter((item) => item.id !== videoId);
-    setFreeResources({ youtubeLinks: nextYoutube });
+    await setFreeResources({ youtubeLinks: nextYoutube });
     setStatus("YouTube link removed.");
   }
 
-  function handleReset() {
+  async function handleReset() {
     if (resetPhrase !== "RESET") {
       setStatus("Type RESET to clear saved content.");
       return;
     }
 
-    resetContentFromAdmin();
-    setResetPhrase("");
-    setStatus("Saved content cleared by admin permission.");
+    try {
+      await resetContentFromAdmin();
+      setResetPhrase("");
+      setStatus("Saved content cleared by admin permission.");
+    } catch {
+      setStatus("Could not reset content in MongoDB.");
+    }
   }
 
   function handleLogout() {
@@ -649,6 +690,7 @@ export default function AdminPage() {
                   type="button"
                   className="btn btn-primary"
                   onClick={handleSave}
+                  disabled={isHydratingContent}
                 >
                   Save Content
                 </button>
@@ -890,8 +932,7 @@ export default function AdminPage() {
         <aside className="admin-sidebar-card">
           <h3>Safety Controls</h3>
           <p>
-            Saved content stays in browser local storage and remains after
-            refresh. Only admin reset will clear it in this app.
+            Data is saved only through the server API and MongoDB.
           </p>
           <label>
             Type RESET to clear saved content
