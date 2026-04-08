@@ -24,8 +24,6 @@ export default function ContactPage() {
   const [status, setStatus] = useState("");
 
   const cp = content?.contactPage || {};
-  const mailTo = cp.mailTo || "civilworld.edu@example.com";
-  const mailSubject = cp.mailSubject || "Civil World - Course Enquiry";
   const studentTypes = Array.isArray(cp.studentTypes) ? cp.studentTypes : [];
   const programTypes = Array.isArray(cp.programTypes) ? cp.programTypes : [];
   const learningModes = Array.isArray(cp.learningModes) ? cp.learningModes : [];
@@ -124,36 +122,19 @@ export default function ContactPage() {
             });
 
             if (saveResult.mode === "rejected") {
-              setStatus(saveResult.message || "Please check and complete all fields correctly.");
+              setStatus(
+                saveResult.message ||
+                  "Please check and complete all fields correctly.",
+              );
               return;
             }
 
-            const subject = encodeURIComponent(mailSubject);
-            const body = encodeURIComponent(
-              [
-                `Name: ${name}`,
-                `Email: ${email}`,
-                `Phone: ${phone}`,
-                `City: ${city}`,
-                `Student Type: ${studentType}`,
-                `Program: ${program}`,
-                `Learning Mode: ${learningMode}`,
-                "",
-                `Message: ${message}`,
-              ].join("\n"),
-            );
-            window.location.href = `mailto:${mailTo}?subject=${subject}&body=${body}`;
-
             if (saveResult.mode === "server") {
-              setStatus(
-                "Saved successfully. Opening email app with your message...",
-              );
+              setStatus("Saved successfully.");
             } else if (saveResult.mode === "local") {
-              setStatus(
-                "Mongo API unavailable. Saved locally and opening email app now.",
-              );
+              setStatus("Server unavailable. Saved locally.");
             } else {
-              setStatus("Opening email app now. Mongo save was unavailable.");
+              setStatus("Could not save your enquiry. Please try again.");
             }
 
             form.reset();

@@ -654,7 +654,11 @@ h2 {
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(15, 139, 141, 0.22), transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(15, 139, 141, 0.22),
+    transparent 70%
+  );
 }
 
 .feature-card h3 {
@@ -715,7 +719,11 @@ h2 {
   border-radius: 18px;
   padding: 1.1rem;
   background:
-    radial-gradient(circle at 88% 8%, rgba(255, 209, 102, 0.22), transparent 34%),
+    radial-gradient(
+      circle at 88% 8%,
+      rgba(255, 209, 102, 0.22),
+      transparent 34%
+    ),
     linear-gradient(
       145deg,
       color-mix(in srgb, var(--surface) 94%, #fff),
@@ -760,7 +768,11 @@ h2 {
   border-radius: 16px;
   padding: 1rem;
   background:
-    radial-gradient(circle at 92% 12%, rgba(15, 139, 141, 0.16), transparent 36%),
+    radial-gradient(
+      circle at 92% 12%,
+      rgba(15, 139, 141, 0.16),
+      transparent 36%
+    ),
     linear-gradient(
       145deg,
       color-mix(in srgb, var(--surface) 92%, #fff),
@@ -807,7 +819,11 @@ h2 {
 
 body.theme-night .civil-focus-card {
   background:
-    radial-gradient(circle at 92% 12%, rgba(42, 183, 185, 0.2), transparent 36%),
+    radial-gradient(
+      circle at 92% 12%,
+      rgba(42, 183, 185, 0.2),
+      transparent 36%
+    ),
     linear-gradient(
       145deg,
       color-mix(in srgb, var(--surface) 88%, #0a1a26),
@@ -817,7 +833,11 @@ body.theme-night .civil-focus-card {
 
 body.theme-night .hsbte-result-card {
   background:
-    radial-gradient(circle at 88% 8%, rgba(255, 209, 102, 0.18), transparent 34%),
+    radial-gradient(
+      circle at 88% 8%,
+      rgba(255, 209, 102, 0.18),
+      transparent 34%
+    ),
     linear-gradient(
       145deg,
       color-mix(in srgb, var(--surface) 88%, #0a1a26),
@@ -1386,7 +1406,11 @@ body.theme-night .site-footer {
   text-decoration: none;
   color: var(--ink);
   background:
-    radial-gradient(circle at 85% 8%, rgba(255, 209, 102, 0.2), transparent 45%),
+    radial-gradient(
+      circle at 85% 8%,
+      rgba(255, 209, 102, 0.2),
+      transparent 45%
+    ),
     color-mix(in srgb, var(--surface) 86%, #fff);
 }
 

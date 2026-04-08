@@ -51,7 +51,9 @@ function buildValidatedContact(payload) {
   }
 
   const contact = {
-    id: asTrimmedText(payload.id) || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id:
+      asTrimmedText(payload.id) ||
+      `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     createdAt: asTrimmedText(payload.createdAt) || new Date().toISOString(),
     status: "new",
   };
@@ -110,7 +112,9 @@ export default async function handler(req, res) {
       }
 
       if (status !== "new" && status !== "read") {
-        return send(res, 400, { error: "status must be either 'new' or 'read'." });
+        return send(res, 400, {
+          error: "status must be either 'new' or 'read'.",
+        });
       }
 
       await collection.updateOne({ id }, { $set: { status } });
