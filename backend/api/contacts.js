@@ -2,6 +2,17 @@ import { getDb } from "./_lib/mongodb.js";
 
 const COLLECTION = "contacts";
 
+const REQUIRED_FIELDS = [
+  "name",
+  "email",
+  "phone",
+  "city",
+  "studentType",
+  "program",
+  "learningMode",
+  "message",
+];
+
 function send(res, status, payload) {
   res.status(status).json(payload);
 }
@@ -22,6 +33,47 @@ function parseBody(req) {
   return req.body;
 }
 
+function asTrimmedText(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isValidPhone(phone) {
+  return /^[0-9+\-()\s]{7,20}$/.test(phone);
+}
+
+function buildValidatedContact(payload) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return { error: "Invalid contact payload." };
+  }
+
+  const contact = {
+    id: asTrimmedText(payload.id) || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    createdAt: asTrimmedText(payload.createdAt) || new Date().toISOString(),
+    status: "new",
+  };
+
+  for (const field of REQUIRED_FIELDS) {
+    contact[field] = asTrimmedText(payload[field]);
+    if (!contact[field]) {
+      return { error: `Missing required field: ${field}` };
+    }
+  }
+
+  if (!isValidEmail(contact.email)) {
+    return { error: "Invalid email format." };
+  }
+
+  if (!isValidPhone(contact.phone)) {
+    return { error: "Invalid phone format." };
+  }
+
+  return { contact };
+}
+
 export default async function handler(req, res) {
   try {
     const db = await getDb();
@@ -38,21 +90,27 @@ export default async function handler(req, res) {
 
     if (req.method === "POST") {
       const payload = parseBody(req);
-      if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
-        return send(res, 400, { error: "Invalid contact payload." });
+      const { contact, error } = buildValidatedContact(payload);
+
+      if (error) {
+        return send(res, 400, { error });
       }
 
-      await collection.insertOne(payload);
+      await collection.insertOne(contact);
       return send(res, 201, { ok: true });
     }
 
     if (req.method === "PATCH") {
       const payload = parseBody(req);
-      const id = payload?.id;
-      const status = payload?.status;
+      const id = asTrimmedText(payload?.id);
+      const status = asTrimmedText(payload?.status).toLowerCase();
 
       if (!id || !status) {
         return send(res, 400, { error: "id and status are required." });
+      }
+
+      if (status !== "new" && status !== "read") {
+        return send(res, 400, { error: "status must be either 'new' or 'read'." });
       }
 
       await collection.updateOne({ id }, { $set: { status } });

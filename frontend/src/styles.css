@@ -1211,6 +1211,7 @@ body.theme-night .site-footer {
 }
 
 .contact-form input,
+.contact-form select,
 .contact-form textarea {
   width: 100%;
   font: inherit;
@@ -1222,6 +1223,7 @@ body.theme-night .site-footer {
 }
 
 .contact-form input:focus,
+.contact-form select:focus,
 .contact-form textarea:focus,
 .newsletter-form input:focus {
   outline: none;

@@ -795,10 +795,6 @@ export default function AdminPage() {
                         {item.learningMode || "-"}
                       </p>
                       <p>
-                        <strong>Preferred Start:</strong>{" "}
-                        {item.startMonth || "-"}
-                      </p>
-                      <p>
                         <strong>Message:</strong> {item.message || "-"}
                       </p>
 

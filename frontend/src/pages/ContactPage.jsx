@@ -26,6 +26,9 @@ export default function ContactPage() {
   const cp = content?.contactPage || {};
   const mailTo = cp.mailTo || "civilworld.edu@example.com";
   const mailSubject = cp.mailSubject || "Civil World - Course Enquiry";
+  const studentTypes = Array.isArray(cp.studentTypes) ? cp.studentTypes : [];
+  const programTypes = Array.isArray(cp.programTypes) ? cp.programTypes : [];
+  const learningModes = Array.isArray(cp.learningModes) ? cp.learningModes : [];
 
   function saveContactEnquiryLocal(payload) {
     try {
@@ -50,17 +53,28 @@ export default function ContactPage() {
       });
 
       if (response.ok) {
-        return "server";
+        return { mode: "server" };
+      }
+
+      if (response.status >= 400 && response.status < 500) {
+        const data = await response.json().catch(() => ({}));
+        return {
+          mode: "rejected",
+          message:
+            typeof data?.error === "string"
+              ? data.error
+              : "Submission rejected by server validation.",
+        };
       }
     } catch {
       // Fall back to local backup below.
     }
 
     if (saveContactEnquiryLocal(payload)) {
-      return "local";
+      return { mode: "local" };
     }
 
-    return "failed";
+    return { mode: "failed" };
   }
 
   return (
@@ -88,34 +102,53 @@ export default function ContactPage() {
             const data = new FormData(form);
             const name = String(data.get("name") || "").trim();
             const email = String(data.get("email") || "").trim();
+            const phone = String(data.get("phone") || "").trim();
+            const city = String(data.get("city") || "").trim();
+            const studentType = String(data.get("studentType") || "").trim();
+            const program = String(data.get("program") || "").trim();
+            const learningMode = String(data.get("learningMode") || "").trim();
             const message = String(data.get("message") || "").trim();
 
-            const savedMode = await saveContactEnquiry({
+            const saveResult = await saveContactEnquiry({
               id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
               createdAt: new Date().toISOString(),
               name,
               email,
-              phone: "",
-              city: "",
-              studentType: "",
-              program: "",
-              learningMode: "",
-              startMonth: "",
+              phone,
+              city,
+              studentType,
+              program,
+              learningMode,
               message,
               status: "new",
             });
 
+            if (saveResult.mode === "rejected") {
+              setStatus(saveResult.message || "Please check and complete all fields correctly.");
+              return;
+            }
+
             const subject = encodeURIComponent(mailSubject);
             const body = encodeURIComponent(
-              `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+              [
+                `Name: ${name}`,
+                `Email: ${email}`,
+                `Phone: ${phone}`,
+                `City: ${city}`,
+                `Student Type: ${studentType}`,
+                `Program: ${program}`,
+                `Learning Mode: ${learningMode}`,
+                "",
+                `Message: ${message}`,
+              ].join("\n"),
             );
             window.location.href = `mailto:${mailTo}?subject=${subject}&body=${body}`;
 
-            if (savedMode === "server") {
+            if (saveResult.mode === "server") {
               setStatus(
                 "Saved successfully. Opening email app with your message...",
               );
-            } else if (savedMode === "local") {
+            } else if (saveResult.mode === "local") {
               setStatus(
                 "Mongo API unavailable. Saved locally and opening email app now.",
               );
@@ -143,6 +176,64 @@ export default function ContactPage() {
               required
               placeholder="Enter your email"
             />
+          </label>
+          <label>
+            Phone
+            <input
+              name="phone"
+              type="tel"
+              required
+              pattern="[0-9+\-() ]{7,20}"
+              placeholder="Enter your phone number"
+            />
+          </label>
+          <label>
+            City
+            <input
+              name="city"
+              type="text"
+              required
+              placeholder="Enter your city"
+            />
+          </label>
+          <label>
+            Student Type
+            <select name="studentType" required defaultValue="">
+              <option value="" disabled>
+                Select student type
+              </option>
+              {studentTypes.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Program
+            <select name="program" required defaultValue="">
+              <option value="" disabled>
+                Select program
+              </option>
+              {programTypes.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Learning Mode
+            <select name="learningMode" required defaultValue="">
+              <option value="" disabled>
+                Select learning mode
+              </option>
+              {learningModes.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Message
