@@ -80,18 +80,6 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");
   const [resetPhrase, setResetPhrase] = useState("");
-  const [resourceHeading, setResourceHeading] = useState(
-    () => content?.home?.freeResources?.heading || "Free Resources",
-  );
-  const [resourceSubtitle, setResourceSubtitle] = useState(
-    () =>
-      content?.home?.freeResources?.subtitle ||
-      "Download practical notes, question banks, and revision sheets.",
-  );
-  const [youtubeHeading, setYoutubeHeading] = useState(
-    () =>
-      content?.home?.freeResources?.youtubeHeading || "YouTube Learning Videos",
-  );
   const [resourceTitle, setResourceTitle] = useState("");
   const [resourceLink, setResourceLink] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("B.Tech");
@@ -126,16 +114,6 @@ export default function AdminPage() {
   const sectionMeta = SECTION_META[adminSection];
 
   useEffect(() => {
-    setResourceHeading(
-      content?.home?.freeResources?.heading || "Free Resources",
-    );
-    setResourceSubtitle(
-      content?.home?.freeResources?.subtitle ||
-        "Download practical notes, question banks, and revision sheets.",
-    );
-    setYoutubeHeading(
-      content?.home?.freeResources?.youtubeHeading || "YouTube Learning Videos",
-    );
     setSelectedCategory(
       Array.isArray(content?.home?.freeResources?.categories) &&
         content.home.freeResources.categories[0]
@@ -297,24 +275,12 @@ export default function AdminPage() {
 
   async function setFreeResources({
     nextItems = freeResources,
-    heading = resourceHeading,
-    subtitle = resourceSubtitle,
-    youtubeHeading: nextYoutubeHeading = youtubeHeading,
     categories = resourceCategories,
     youtubeLinks = youtubeResources,
   }) {
     const nextContent = {
-      ...content,
       home: {
-        ...content.home,
         freeResources: {
-          ...content.home?.freeResources,
-          heading: heading.trim() || "Free Resources",
-          subtitle:
-            subtitle.trim() ||
-            "Download practical notes, question banks, and revision sheets.",
-          youtubeHeading:
-            nextYoutubeHeading.trim() || "YouTube Learning Videos",
           categories,
           youtubeLinks,
           items: nextItems,
@@ -327,15 +293,6 @@ export default function AdminPage() {
     } catch {
       setStatus("Could not save changes to MongoDB.");
     }
-  }
-
-  async function handleSaveResourceText() {
-    await setFreeResources({
-      heading: resourceHeading,
-      subtitle: resourceSubtitle,
-      youtubeHeading,
-    });
-    setStatus("Resources and YouTube headings updated.");
   }
 
   async function handleAddCategory() {
@@ -562,12 +519,12 @@ export default function AdminPage() {
 
   async function handleReset() {
     if (resetPhrase !== "RESET") {
-      setStatus("Type RESET to clear saved content.");
+      setStatus("Type RESET to clear saved resources/videos.");
       return;
     }
 
     const shouldReset = window.confirm(
-      "This will reset all saved content to default values. Continue?",
+      "This will reset saved resources and YouTube links to default values. Continue?",
     );
     if (!shouldReset) {
       return;
@@ -576,10 +533,10 @@ export default function AdminPage() {
     try {
       await resetContentFromAdmin();
       setResetPhrase("");
-      setStatus("Saved content reset to default values.");
+      setStatus("Saved resources/videos reset to default values.");
       navigate("/admin/dashboard", { replace: true });
     } catch {
-      setStatus("Could not reset content in MongoDB.");
+      setStatus("Could not reset resources/videos in MongoDB.");
     }
   }
 
@@ -872,7 +829,7 @@ export default function AdminPage() {
           {adminSection === "resources" ? (
             <section className="admin-work-block">
               <div className="admin-editor-top">
-                <h3>Resource section settings</h3>
+                <h3>Resource links</h3>
                 <button
                   type="button"
                   className="btn btn-outline"
@@ -880,45 +837,6 @@ export default function AdminPage() {
                   disabled={freeResources.length === 0}
                 >
                   Delete All Entries
-                </button>
-              </div>
-
-              <div className="admin-resource-heading">
-                <label>
-                  Section Heading
-                  <input
-                    type="text"
-                    value={resourceHeading}
-                    onChange={(event) => setResourceHeading(event.target.value)}
-                    placeholder="Free Resources"
-                  />
-                </label>
-                <label>
-                  Section Subtitle
-                  <input
-                    type="text"
-                    value={resourceSubtitle}
-                    onChange={(event) =>
-                      setResourceSubtitle(event.target.value)
-                    }
-                    placeholder="Download practical notes, question banks, and revision sheets."
-                  />
-                </label>
-                <label>
-                  YouTube Section Heading
-                  <input
-                    type="text"
-                    value={youtubeHeading}
-                    onChange={(event) => setYoutubeHeading(event.target.value)}
-                    placeholder="YouTube Learning Videos"
-                  />
-                </label>
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={handleSaveResourceText}
-                >
-                  Save Section Text
                 </button>
               </div>
 
@@ -1135,10 +1053,10 @@ export default function AdminPage() {
           {adminSection === "safety" ? (
             <section className="admin-work-block">
               <article className="admin-safety-card">
-                <h3>Reset Content</h3>
+                <h3>Reset Resource Storage</h3>
                 <p>
-                  This action will reset all content in MongoDB back to default
-                  values.
+                  This action resets only DB-managed resources and YouTube links
+                  back to default values. Website copy/layout remains hardcoded.
                 </p>
                 <label>
                   Type RESET to confirm
@@ -1154,7 +1072,7 @@ export default function AdminPage() {
                   className="btn btn-outline"
                   onClick={handleReset}
                 >
-                  Clear Saved Content
+                  Clear Saved Resources/Videos
                 </button>
               </article>
             </section>

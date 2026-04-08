@@ -10,9 +10,9 @@ export default function ContentGate({ children }) {
       <section className="container content-gate" aria-busy="true">
         <div className="section-head">
           <p className="eyebrow">{brand}</p>
-          <h2>Loading content…</h2>
+          <h2>Loading resources…</h2>
           <p className="content-gate-hint">
-            Preparing your page from the server.
+            Preparing hardcoded pages and syncing latest resource links.
           </p>
         </div>
       </section>
@@ -27,7 +27,7 @@ export default function ContentGate({ children }) {
           <h2>Content unavailable</h2>
           <p className="content-gate-hint">
             {contentLoadError ||
-              "Could not load site content. Check that the API and MongoDB are configured, then refresh."}
+              "Could not load site content. Please refresh and try again."}
           </p>
         </div>
       </section>

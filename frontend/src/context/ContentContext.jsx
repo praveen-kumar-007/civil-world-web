@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { defaultContent } from "../data/defaultContent";
 
-const STORAGE_KEY = "cw_content_v1";
 const ADMIN_SESSION_KEY = "cw_admin_session_v1";
 const API_BASE_URL = String(import.meta.env.VITE_API_BASE_URL || "").trim();
 
@@ -21,99 +20,58 @@ function getApiUrl(path) {
 
 const ContentContext = createContext(null);
 
-function isPlainObject(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function deepMerge(base, override) {
-  if (Array.isArray(base)) {
-    return Array.isArray(override) ? override : base;
-  }
-
-  if (isPlainObject(base)) {
-    const result = { ...base };
-    const entries = isPlainObject(override) ? Object.entries(override) : [];
-
-    entries.forEach(([key, value]) => {
-      if (key in base) {
-        result[key] = deepMerge(base[key], value);
-      }
-    });
-
-    return result;
-  }
-
-  return override === undefined ? base : override;
-}
-
-function extractDbManagedContent(source) {
+function extractDbManagedData(source) {
   const freeResources = source?.home?.freeResources || {};
-  const data = source?.data || {};
 
   return {
+    categories: Array.isArray(freeResources.categories)
+      ? freeResources.categories
+      : defaultContent.home.freeResources.categories,
+    items: Array.isArray(freeResources.items)
+      ? freeResources.items
+      : defaultContent.home.freeResources.items,
+    youtubeLinks: Array.isArray(freeResources.youtubeLinks)
+      ? freeResources.youtubeLinks
+      : defaultContent.home.freeResources.youtubeLinks,
+  };
+}
+
+function composeAppContent(managed) {
+  return {
+    ...defaultContent,
     home: {
+      ...defaultContent.home,
       freeResources: {
-        heading:
-          typeof freeResources.heading === "string"
-            ? freeResources.heading
-            : defaultContent.home.freeResources.heading,
-        subtitle:
-          typeof freeResources.subtitle === "string"
-            ? freeResources.subtitle
-            : defaultContent.home.freeResources.subtitle,
-        youtubeHeading:
-          typeof freeResources.youtubeHeading === "string"
-            ? freeResources.youtubeHeading
-            : defaultContent.home.freeResources.youtubeHeading,
-        categories: Array.isArray(freeResources.categories)
-          ? freeResources.categories
-          : defaultContent.home.freeResources.categories,
-        items: Array.isArray(freeResources.items)
-          ? freeResources.items
-          : defaultContent.home.freeResources.items,
-        youtubeLinks: Array.isArray(freeResources.youtubeLinks)
-          ? freeResources.youtubeLinks
-          : defaultContent.home.freeResources.youtubeLinks,
+        ...defaultContent.home.freeResources,
+        categories: managed.categories,
+        items: managed.items,
+        youtubeLinks: managed.youtubeLinks,
       },
-    },
-    data: {
-      courses: Array.isArray(data.courses)
-        ? data.courses
-        : defaultContent.data.courses,
-      resources: Array.isArray(data.resources)
-        ? data.resources
-        : defaultContent.data.resources,
     },
   };
 }
 
-function composeAppContent(source) {
-  return deepMerge(defaultContent, extractDbManagedContent(source));
-}
-
-function loadLocalContent() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return null;
-    }
-
-    const parsed = JSON.parse(raw);
-    return composeAppContent(parsed);
-  } catch {
-    return null;
-  }
+function buildManagedPayload(managed) {
+  return {
+    home: {
+      freeResources: {
+        categories: managed.categories,
+        items: managed.items,
+        youtubeLinks: managed.youtubeLinks,
+      },
+    },
+  };
 }
 
 export function ContentProvider({ children }) {
-  const [content, setContent] = useState(() => loadLocalContent());
+  const [content, setContent] = useState(defaultContent);
   const [isHydratingContent, setIsHydratingContent] = useState(true);
   const [contentLoadError, setContentLoadError] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
 
-    async function hydrateFromServer() {
+    async function hydrateManagedData() {
       setContentLoadError(null);
       try {
         const contentUrl = getApiUrl("/api/content");
@@ -142,38 +100,19 @@ export function ContentProvider({ children }) {
         }
 
         if (!payload?.content) {
-          throw new Error("No content document in database.");
+          throw new Error("No resource document in database.");
         }
 
-        const dbManaged = extractDbManagedContent(payload.content);
-        const normalized = composeAppContent(payload.content);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
-        setContent(normalized);
-
-        // Migrate older full-content documents to the restricted DB shape.
-        if (JSON.stringify(payload.content) !== JSON.stringify(dbManaged)) {
-          await fetch(contentUrl, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dbManaged),
-          });
-        }
+        const managed = extractDbManagedData(payload.content);
+        setContent(composeAppContent(managed));
       } catch (error) {
-        const localBackup = loadLocalContent();
         if (isMounted) {
-          if (localBackup) {
-            setContent(localBackup);
-            setContentLoadError(
-              "Server unavailable. Loaded last saved local content.",
-            );
-          } else {
-            setContent(defaultContent);
-            setContentLoadError(
-              error instanceof Error
-                ? error.message
-                : "Failed to load content.",
-            );
-          }
+          setContent(defaultContent);
+          setContentLoadError(
+            error instanceof Error
+              ? `Using hardcoded site content. ${error.message}`
+              : "Using hardcoded site content. Failed to load resources/videos from server.",
+          );
         }
       } finally {
         if (isMounted) {
@@ -182,7 +121,7 @@ export function ContentProvider({ children }) {
       }
     }
 
-    hydrateFromServer();
+    hydrateManagedData();
 
     return () => {
       isMounted = false;
@@ -195,41 +134,38 @@ export function ContentProvider({ children }) {
       isHydratingContent,
       contentLoadError,
       saveContentToServer: async (nextContent) => {
-        const dbManaged = extractDbManagedContent(nextContent);
-        const normalized = composeAppContent(nextContent);
-        setContent(normalized);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+        const managed = extractDbManagedData(nextContent);
+        setContent(composeAppContent(managed));
 
         const contentUrl = getApiUrl("/api/content");
         const response = await fetch(contentUrl, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dbManaged),
+          body: JSON.stringify(buildManagedPayload(managed)),
         });
 
         if (!response.ok) {
-          setContentLoadError("Saved locally, but server save failed.");
-          throw new Error("Failed to save content to server.");
+          setContentLoadError("Saved in app state, but server save failed.");
+          throw new Error("Failed to save resources/videos to server.");
         }
 
         setContentLoadError(null);
       },
       resetContentFromAdmin: async () => {
-        localStorage.removeItem(STORAGE_KEY);
-        const dbManagedDefaults = extractDbManagedContent(defaultContent);
+        const managedDefaults = extractDbManagedData(defaultContent);
 
         const contentUrl = getApiUrl("/api/content");
         const response = await fetch(contentUrl, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dbManagedDefaults),
+          body: JSON.stringify(buildManagedPayload(managedDefaults)),
         });
 
         if (!response.ok) {
-          throw new Error("Failed to reset content on server.");
+          throw new Error("Failed to reset resources/videos on server.");
         }
 
-        setContent(defaultContent);
+        setContent(composeAppContent(managedDefaults));
         setContentLoadError(null);
       },
       adminSessionKey: ADMIN_SESSION_KEY,
