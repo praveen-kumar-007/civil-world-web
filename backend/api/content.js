@@ -24,27 +24,36 @@ function parseBody(req) {
   return req.body;
 }
 
-function sanitizeLegacyTerms(value) {
-  if (typeof value === "string") {
-    return value
-      .replace(/political\s+science/gi, "polytechnic civil engineering")
-      .replace(/political\s+theory/gi, "polytechnic engineering")
-      .replace(/political/gi, "polytechnic");
-  }
+function normalizeDbManagedContent(source) {
+  const freeResources = source?.home?.freeResources || {};
 
-  if (Array.isArray(value)) {
-    return value.map((item) => sanitizeLegacyTerms(item));
-  }
-
-  if (value && typeof value === "object") {
-    const output = {};
-    for (const [key, item] of Object.entries(value)) {
-      output[key] = sanitizeLegacyTerms(item);
-    }
-    return output;
-  }
-
-  return value;
+  return {
+    home: {
+      freeResources: {
+        heading:
+          typeof freeResources.heading === "string"
+            ? freeResources.heading
+            : defaultContent.home.freeResources.heading,
+        subtitle:
+          typeof freeResources.subtitle === "string"
+            ? freeResources.subtitle
+            : defaultContent.home.freeResources.subtitle,
+        youtubeHeading:
+          typeof freeResources.youtubeHeading === "string"
+            ? freeResources.youtubeHeading
+            : defaultContent.home.freeResources.youtubeHeading,
+        categories: Array.isArray(freeResources.categories)
+          ? freeResources.categories
+          : defaultContent.home.freeResources.categories,
+        items: Array.isArray(freeResources.items)
+          ? freeResources.items
+          : defaultContent.home.freeResources.items,
+        youtubeLinks: Array.isArray(freeResources.youtubeLinks)
+          ? freeResources.youtubeLinks
+          : defaultContent.home.freeResources.youtubeLinks,
+      },
+    },
+  };
 }
 
 export default async function handler(req, res) {
@@ -55,27 +64,27 @@ export default async function handler(req, res) {
     if (req.method === "GET") {
       const doc = await collection.findOne({ _id: DOC_ID });
       if (doc?.content) {
-        const sanitized = sanitizeLegacyTerms(doc.content);
+        const normalized = normalizeDbManagedContent(doc.content);
 
         await collection.updateOne(
           { _id: DOC_ID },
           {
             $set: {
-              content: sanitized,
+              content: normalized,
               updatedAt: new Date().toISOString(),
             },
           },
         );
 
-        return send(res, 200, { content: sanitized });
+        return send(res, 200, { content: normalized });
       }
 
-      const sanitizedDefault = sanitizeLegacyTerms(defaultContent);
+      const defaultManaged = normalizeDbManagedContent(defaultContent);
       await collection.updateOne(
         { _id: DOC_ID },
         {
           $set: {
-            content: sanitizedDefault,
+            content: defaultManaged,
             updatedAt: new Date().toISOString(),
             source: "auto-seeded-default",
           },
@@ -83,7 +92,7 @@ export default async function handler(req, res) {
         { upsert: true },
       );
 
-      return send(res, 200, { content: sanitizedDefault });
+      return send(res, 200, { content: defaultManaged });
     }
 
     if (req.method === "PUT") {
@@ -92,13 +101,13 @@ export default async function handler(req, res) {
         return send(res, 400, { error: "Invalid JSON body." });
       }
 
-      const sanitizedBody = sanitizeLegacyTerms(body);
+      const normalizedBody = normalizeDbManagedContent(body);
 
       await collection.updateOne(
         { _id: DOC_ID },
         {
           $set: {
-            content: sanitizedBody,
+            content: normalizedBody,
             updatedAt: new Date().toISOString(),
           },
         },

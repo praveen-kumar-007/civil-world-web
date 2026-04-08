@@ -20,10 +20,22 @@ function getApiUrl(path) {
 
 const ContentContext = createContext(null);
 
-function extractDbManagedData(source) {
+function extractDbManagedContent(source) {
   const freeResources = source?.home?.freeResources || {};
 
   return {
+    heading:
+      typeof freeResources.heading === "string"
+        ? freeResources.heading
+        : defaultContent.home.freeResources.heading,
+    subtitle:
+      typeof freeResources.subtitle === "string"
+        ? freeResources.subtitle
+        : defaultContent.home.freeResources.subtitle,
+    youtubeHeading:
+      typeof freeResources.youtubeHeading === "string"
+        ? freeResources.youtubeHeading
+        : defaultContent.home.freeResources.youtubeHeading,
     categories: Array.isArray(freeResources.categories)
       ? freeResources.categories
       : defaultContent.home.freeResources.categories,
@@ -43,6 +55,9 @@ function composeAppContent(managed) {
       ...defaultContent.home,
       freeResources: {
         ...defaultContent.home.freeResources,
+        heading: managed.heading,
+        subtitle: managed.subtitle,
+        youtubeHeading: managed.youtubeHeading,
         categories: managed.categories,
         items: managed.items,
         youtubeLinks: managed.youtubeLinks,
@@ -55,6 +70,9 @@ function buildManagedPayload(managed) {
   return {
     home: {
       freeResources: {
+        heading: managed.heading,
+        subtitle: managed.subtitle,
+        youtubeHeading: managed.youtubeHeading,
         categories: managed.categories,
         items: managed.items,
         youtubeLinks: managed.youtubeLinks,
@@ -71,7 +89,7 @@ export function ContentProvider({ children }) {
   useEffect(() => {
     let isMounted = true;
 
-    async function hydrateManagedData() {
+    async function hydrateFromServer() {
       setContentLoadError(null);
       try {
         const contentUrl = getApiUrl("/api/content");
@@ -80,30 +98,12 @@ export function ContentProvider({ children }) {
           throw new Error(`Content API returned ${response.status}`);
         }
 
-        const contentType = response.headers.get("content-type") || "";
-        const rawBody = await response.text();
-        if (!contentType.toLowerCase().includes("application/json")) {
-          throw new Error(
-            "API route /api/content is not returning JSON. Run with Vercel serverless API enabled (for example `vercel dev`) or deploy backend API.",
-          );
-        }
-
-        let payload;
-        try {
-          payload = JSON.parse(rawBody);
-        } catch {
-          throw new Error("Content API returned invalid JSON.");
-        }
-
+        const payload = await response.json();
         if (!isMounted) {
           return;
         }
 
-        if (!payload?.content) {
-          throw new Error("No resource document in database.");
-        }
-
-        const managed = extractDbManagedData(payload.content);
+        const managed = extractDbManagedContent(payload?.content || {});
         setContent(composeAppContent(managed));
       } catch (error) {
         if (isMounted) {
@@ -111,7 +111,7 @@ export function ContentProvider({ children }) {
           setContentLoadError(
             error instanceof Error
               ? `Using hardcoded site content. ${error.message}`
-              : "Using hardcoded site content. Failed to load resources/videos from server.",
+              : "Using hardcoded site content. Failed to load DB-managed resources/videos.",
           );
         }
       } finally {
@@ -121,7 +121,7 @@ export function ContentProvider({ children }) {
       }
     }
 
-    hydrateManagedData();
+    hydrateFromServer();
 
     return () => {
       isMounted = false;
@@ -134,7 +134,7 @@ export function ContentProvider({ children }) {
       isHydratingContent,
       contentLoadError,
       saveContentToServer: async (nextContent) => {
-        const managed = extractDbManagedData(nextContent);
+        const managed = extractDbManagedContent(nextContent || {});
         setContent(composeAppContent(managed));
 
         const contentUrl = getApiUrl("/api/content");
@@ -146,13 +146,13 @@ export function ContentProvider({ children }) {
 
         if (!response.ok) {
           setContentLoadError("Saved in app state, but server save failed.");
-          throw new Error("Failed to save resources/videos to server.");
+          throw new Error("Failed to save content/resources/videos to server.");
         }
 
         setContentLoadError(null);
       },
       resetContentFromAdmin: async () => {
-        const managedDefaults = extractDbManagedData(defaultContent);
+        const managedDefaults = extractDbManagedContent(defaultContent);
 
         const contentUrl = getApiUrl("/api/content");
         const response = await fetch(contentUrl, {
@@ -162,7 +162,7 @@ export function ContentProvider({ children }) {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to reset resources/videos on server.");
+          throw new Error("Failed to reset DB-managed content on server.");
         }
 
         setContent(composeAppContent(managedDefaults));

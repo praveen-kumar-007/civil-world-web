@@ -313,7 +313,7 @@ export default function HomePage() {
 
       <section
         className="container hsbte-result-block"
-        aria-label="HSBTE result portal"
+        aria-label="HSBTE official board portal"
       >
         <div className="hsbte-result-card">
           <div className="hsbte-brand">
@@ -329,15 +329,18 @@ export default function HomePage() {
             />
             <div>
               <p className="eyebrow">
-                {hsbteResultPortal?.heading || "Haryana Polytechnic Results"}
+                {hsbteResultPortal?.heading || "HSBTE Official Board Portal"}
               </p>
-              <h2>{hsbteResultPortal?.title || "HSBTE Result Portal"}</h2>
+              <h2>
+                {hsbteResultPortal?.title ||
+                  "HSBTE Admissions, Results and Syllabus"}
+              </h2>
             </div>
           </div>
 
           <p>
             {hsbteResultPortal?.description ||
-              "Check semester results from the official HSBTE portal."}
+              "Access admissions, results, syllabus, and official updates from the HSBTE portal."}
           </p>
 
           {hsbteDetails.length ? (
@@ -354,7 +357,7 @@ export default function HomePage() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            {hsbteResultPortal?.ctaLabel || "Check HSBTE Result"}
+            {hsbteResultPortal?.ctaLabel || "Open HSBTE Official Portal"}
           </a>
         </div>
       </section>

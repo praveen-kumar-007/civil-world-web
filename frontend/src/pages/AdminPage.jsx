@@ -80,6 +80,18 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");
   const [resetPhrase, setResetPhrase] = useState("");
+  const [resourceHeading, setResourceHeading] = useState(
+    () => content?.home?.freeResources?.heading || "Free Resources",
+  );
+  const [resourceSubtitle, setResourceSubtitle] = useState(
+    () =>
+      content?.home?.freeResources?.subtitle ||
+      "Download practical notes, question banks, and revision sheets.",
+  );
+  const [youtubeHeading, setYoutubeHeading] = useState(
+    () =>
+      content?.home?.freeResources?.youtubeHeading || "YouTube Learning Videos",
+  );
   const [resourceTitle, setResourceTitle] = useState("");
   const [resourceLink, setResourceLink] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("B.Tech");
@@ -114,6 +126,16 @@ export default function AdminPage() {
   const sectionMeta = SECTION_META[adminSection];
 
   useEffect(() => {
+    setResourceHeading(
+      content?.home?.freeResources?.heading || "Free Resources",
+    );
+    setResourceSubtitle(
+      content?.home?.freeResources?.subtitle ||
+        "Download practical notes, question banks, and revision sheets.",
+    );
+    setYoutubeHeading(
+      content?.home?.freeResources?.youtubeHeading || "YouTube Learning Videos",
+    );
     setSelectedCategory(
       Array.isArray(content?.home?.freeResources?.categories) &&
         content.home.freeResources.categories[0]
@@ -275,12 +297,21 @@ export default function AdminPage() {
 
   async function setFreeResources({
     nextItems = freeResources,
+    heading = resourceHeading,
+    subtitle = resourceSubtitle,
+    youtubeHeading: nextYoutubeHeading = youtubeHeading,
     categories = resourceCategories,
     youtubeLinks = youtubeResources,
   }) {
     const nextContent = {
       home: {
         freeResources: {
+          heading: heading.trim() || "Free Resources",
+          subtitle:
+            subtitle.trim() ||
+            "Download practical notes, question banks, and revision sheets.",
+          youtubeHeading:
+            nextYoutubeHeading.trim() || "YouTube Learning Videos",
           categories,
           youtubeLinks,
           items: nextItems,
@@ -293,6 +324,15 @@ export default function AdminPage() {
     } catch {
       setStatus("Could not save changes to MongoDB.");
     }
+  }
+
+  async function handleSaveResourceText() {
+    await setFreeResources({
+      heading: resourceHeading,
+      subtitle: resourceSubtitle,
+      youtubeHeading,
+    });
+    setStatus("Resource headings updated successfully.");
   }
 
   async function handleAddCategory() {
@@ -833,6 +873,43 @@ export default function AdminPage() {
                   disabled={freeResources.length === 0}
                 >
                   Delete All Entries
+                </button>
+              </div>
+
+              <div className="admin-resource-heading">
+                <label>
+                  Resource Section Heading
+                  <input
+                    type="text"
+                    value={resourceHeading}
+                    onChange={(event) => setResourceHeading(event.target.value)}
+                    placeholder="Free Resources"
+                  />
+                </label>
+                <label>
+                  Resource Section Subtitle
+                  <input
+                    type="text"
+                    value={resourceSubtitle}
+                    onChange={(event) => setResourceSubtitle(event.target.value)}
+                    placeholder="Download practical notes, question banks, and revision sheets."
+                  />
+                </label>
+                <label>
+                  YouTube Section Heading
+                  <input
+                    type="text"
+                    value={youtubeHeading}
+                    onChange={(event) => setYoutubeHeading(event.target.value)}
+                    placeholder="YouTube Learning Videos"
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={handleSaveResourceText}
+                >
+                  Save Section Text
                 </button>
               </div>
 

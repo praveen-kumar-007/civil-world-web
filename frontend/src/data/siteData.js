@@ -6,7 +6,7 @@ export const socialLinks = [
   { name: "Instagram", url: "https://www.instagram.com/" },
   { name: "Facebook", url: "https://www.facebook.com/" },
   { name: "X", url: "https://x.com/" },
-  { name: "HSBTE Results", url: "https://hsbte.org.in/" },
+  { name: "HSBTE Portal", url: "https://hsbte.org.in/" },
   { name: "Telegram", url: "https://t.me/" },
   { name: "LinkedIn", url: "https://www.linkedin.com/" },
   { name: "WhatsApp", url: "https://wa.me/918506823246" },
