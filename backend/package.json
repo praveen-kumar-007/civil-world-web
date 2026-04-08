@@ -1,0 +1,17 @@
+{
+    "name": "civil-world-backend",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "node --watch server.js",
+        "start": "node server.js",
+        "seed": "node scripts/seedCurrentContentToMongo.mjs"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^4.21.2",
+        "mongodb": "^7.1.1"
+    }
+}
