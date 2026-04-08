@@ -5,14 +5,6 @@ import EducationalModel from "../components/EducationalModel";
 import { useContent } from "../context/ContentContext";
 import { defaultContent } from "../data/defaultContent.js";
 
-function normalizeLegacyTerms(value) {
-  const raw = String(value || "");
-  return raw
-    .replace(/political\s+science/gi, "polytechnic civil engineering")
-    .replace(/political\s+theory/gi, "polytechnic engineering")
-    .replace(/political/gi, "polytechnic");
-}
-
 function toYouTubeEmbedUrl(rawUrl) {
   if (!rawUrl) {
     return null;
@@ -58,21 +50,24 @@ export default function HomePage() {
   const [wordIndex, setWordIndex] = useState(0);
   const [newsletterMessage, setNewsletterMessage] = useState("");
   const typedWords = Array.isArray(content?.home?.typedWords)
-    ? content.home.typedWords.map((word) => normalizeLegacyTerms(word))
+    ? content.home.typedWords
     : ["clarity"];
   const updates = Array.isArray(content?.home?.updates)
-    ? content.home.updates.map((line) => normalizeLegacyTerms(line))
+    ? content.home.updates
     : [];
   const stats = Array.isArray(content?.data?.stats) ? content.data.stats : [];
   const testimonials = Array.isArray(content?.data?.testimonials)
     ? content.data.testimonials
     : [];
-  const faqItems = Array.isArray(content?.data?.faqItems) ? content.data.faqItems : [];
+  const faqItems = Array.isArray(content?.data?.faqItems)
+    ? content.data.faqItems
+    : [];
   const [displayStats, setDisplayStats] = useState(stats.map(() => 0));
 
   const pageCards = useMemo(
     () =>
-      Array.isArray(content?.home?.pageCards) && content.home.pageCards.length > 0
+      Array.isArray(content?.home?.pageCards) &&
+      content.home.pageCards.length > 0
         ? content.home.pageCards
         : [
             { title: "Mentor Story", to: "/about" },
@@ -149,7 +144,9 @@ export default function HomePage() {
 
   useEffect(() => {
     const slider = setInterval(() => {
-      setActiveSlide((current) => (current + 1) % Math.max(1, testimonials.length));
+      setActiveSlide(
+        (current) => (current + 1) % Math.max(1, testimonials.length),
+      );
     }, 5000);
     return () => clearInterval(slider);
   }, [testimonials.length]);
@@ -190,20 +187,14 @@ export default function HomePage() {
       </section>
 
       <PageHero
-        eyebrow={normalizeLegacyTerms(
-          content?.home?.eyebrow || "Haryana's Trusted Mentor",
-        )}
-        title={normalizeLegacyTerms(
-          (content?.home?.titleTemplate || "Master with {word}.").replace(
-            "{word}",
-            typedWords[wordIndex] || "confidence",
-          ),
+        eyebrow={content?.home?.eyebrow || "Haryana's Trusted Mentor"}
+        title={(content?.home?.titleTemplate || "Master with {word}.").replace(
+          "{word}",
+          typedWords[wordIndex] || "confidence",
         )}
         subtitle={
-          normalizeLegacyTerms(
-            content?.home?.subtitle ||
-              "Civil World delivers concept-first teaching and exam-ready training.",
-          )
+          content?.home?.subtitle ||
+          "Civil World delivers concept-first teaching and exam-ready training."
         }
       >
         <div className="hero-layout">
@@ -230,7 +221,7 @@ export default function HomePage() {
 
             <div className="hero-badges">
               {(content?.home?.heroBadges || []).map((item) => (
-                <span key={item}>{normalizeLegacyTerms(item)}</span>
+                <span key={item}>{item}</span>
               ))}
             </div>
           </div>
@@ -299,7 +290,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="container civil-showcase" aria-label="Civil engineering focus areas">
+      <section
+        className="container civil-showcase"
+        aria-label="Civil engineering focus areas"
+      >
         <div className="section-head">
           <p className="eyebrow">Civil Engineering Focus</p>
           <h2>Built for B.Tech Civil and Polytechnic Civil students</h2>
@@ -317,20 +311,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="container hsbte-result-block" aria-label="HSBTE result portal">
+      <section
+        className="container hsbte-result-block"
+        aria-label="HSBTE result portal"
+      >
         <div className="hsbte-result-card">
           <div className="hsbte-brand">
             <img
-              src={
-                hsbteResultPortal?.logo ||
-                "https://hsbte.org.in/assets/img/logo/HSBTEb2.png"
-              }
+              src={hsbteResultPortal?.logo || "/images/hsbte-logo.png"}
               alt="HSBTE logo"
               className="hsbte-logo"
               loading="lazy"
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = "/images/hsbte-logo.png";
+              }}
             />
             <div>
-              <p className="eyebrow">{hsbteResultPortal?.heading || "Haryana Polytechnic Results"}</p>
+              <p className="eyebrow">
+                {hsbteResultPortal?.heading || "Haryana Polytechnic Results"}
+              </p>
               <h2>{hsbteResultPortal?.title || "HSBTE Result Portal"}</h2>
             </div>
           </div>
@@ -361,7 +361,9 @@ export default function HomePage() {
 
       <section className="container home-free-resources">
         <div className="section-head">
-          <p className="eyebrow">{freeResources?.heading || "Free Resources"}</p>
+          <p className="eyebrow">
+            {freeResources?.heading || "Free Resources"}
+          </p>
           <h2>
             {freeResources?.subtitle ||
               "Download practical notes and revision sheets curated by admin."}
@@ -373,7 +375,11 @@ export default function HomePage() {
             freeResourceItems.map((item) => (
               <article key={item.id || item.url} className="resource-item">
                 <h3>{item.title || "Study resource"}</h3>
-                <p>{item.category ? `Category: ${item.category}` : "Google Drive link"}</p>
+                <p>
+                  {item.category
+                    ? `Category: ${item.category}`
+                    : "Google Drive link"}
+                </p>
                 <a
                   className="btn btn-outline"
                   href={item.url}
@@ -406,7 +412,11 @@ export default function HomePage() {
                       className="youtube-fallback-card"
                     >
                       <p>{video?.title || `Video ${index + 1}`}</p>
-                      <a href={video?.url} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={video?.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         Open on YouTube
                       </a>
                     </article>
@@ -457,12 +467,12 @@ export default function HomePage() {
             <div className="slider-controls">
               <button
                 type="button"
-                  disabled={testimonials.length === 0}
+                disabled={testimonials.length === 0}
                 onClick={() =>
                   setActiveSlide(
                     (current) =>
-                        (current - 1 + Math.max(1, testimonials.length)) %
-                        Math.max(1, testimonials.length),
+                      (current - 1 + Math.max(1, testimonials.length)) %
+                      Math.max(1, testimonials.length),
                   )
                 }
               >
@@ -470,10 +480,11 @@ export default function HomePage() {
               </button>
               <button
                 type="button"
-                  disabled={testimonials.length === 0}
+                disabled={testimonials.length === 0}
                 onClick={() =>
                   setActiveSlide(
-                      (current) => (current + 1) % Math.max(1, testimonials.length),
+                    (current) =>
+                      (current + 1) % Math.max(1, testimonials.length),
                   )
                 }
               >
@@ -517,7 +528,10 @@ export default function HomePage() {
           <p className="eyebrow">
             {content?.home?.newsletter?.eyebrow || "Weekly Updates"}
           </p>
-          <h2>{content?.home?.newsletter?.title || "Get classes and notes in your inbox."}</h2>
+          <h2>
+            {content?.home?.newsletter?.title ||
+              "Get classes and notes in your inbox."}
+          </h2>
         </div>
         <form
           className="newsletter-form"
@@ -549,10 +563,11 @@ export default function HomePage() {
       <section className="container cta-pro">
         <div className="cta-pro-card">
           <h2>
-            {content?.home?.cta?.title ||
-              "Ready to level up your preparation?"}
+            {content?.home?.cta?.title || "Ready to level up your preparation?"}
           </h2>
-          <p>{content?.home?.cta?.text || "Start with structured mentorship."}</p>
+          <p>
+            {content?.home?.cta?.text || "Start with structured mentorship."}
+          </p>
           <div className="hero-cta">
             <Link className="btn btn-primary" to="/contact">
               Book a Mentorship Call

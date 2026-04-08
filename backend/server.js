@@ -23,7 +23,7 @@ app.use(
       if (frontendUrls.includes(origin)) return callback(null, true);
       return callback(new Error("CORS origin not allowed"), false);
     },
-  })
+  }),
 );
 app.use(express.json({ limit: "1mb" }));
 

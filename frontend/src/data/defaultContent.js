@@ -96,7 +96,7 @@ export const defaultContent = {
         "Check Haryana State Board of Technical Education semester results directly from the official portal.",
       ctaLabel: "Check HSBTE Result",
       url: "https://hsbte.org.in/",
-      logo: "https://hsbte.org.in/assets/img/logo/HSBTEb2.png",
+      logo: "/images/hsbte-logo.png",
       details: [
         "Open the official HSBTE portal",
         "Select result section",
@@ -116,23 +116,19 @@ export const defaultContent = {
     featureHighlights: [
       {
         title: "Topic-to-Answer Workflow",
-        text:
-          "Every concept is mapped to exam questions so you know exactly how to write scoring answers.",
+        text: "Every concept is mapped to exam questions so you know exactly how to write scoring answers.",
       },
       {
         title: "Weekly Performance Analytics",
-        text:
-          "Track strengths, weaknesses, and improvement areas through structured tests and insights.",
+        text: "Track strengths, weaknesses, and improvement areas through structured tests and insights.",
       },
       {
         title: "Site and Lab Integration",
-        text:
-          "Core civil topics are taught with site-based examples, lab context, and practical interpretation.",
+        text: "Core civil topics are taught with site-based examples, lab context, and practical interpretation.",
       },
       {
         title: "Community-Based Learning",
-        text:
-          "Join discussions, mentor support, and peer learning challenges for consistent progress.",
+        text: "Join discussions, mentor support, and peer learning challenges for consistent progress.",
       },
     ],
     newsletter: {
@@ -162,18 +158,15 @@ export const defaultContent = {
     aboutCards: [
       {
         title: "Concept Clarity First",
-        text:
-          "Every topic starts with relatable examples, then moves into exam language and frameworks.",
+        text: "Every topic starts with relatable examples, then moves into exam language and frameworks.",
       },
       {
         title: "Answer Writing Method",
-        text:
-          "Students learn intros, body structure, and conclusion templates for faster scoring answers.",
+        text: "Students learn intros, body structure, and conclusion templates for faster scoring answers.",
       },
       {
         title: "Civil Application Approach",
-        text:
-          "Every chapter is connected to civil labs, site tasks, and practical semester requirements.",
+        text: "Every chapter is connected to civil labs, site tasks, and practical semester requirements.",
       },
     ],
   },

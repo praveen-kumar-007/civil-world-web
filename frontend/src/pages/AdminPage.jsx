@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import { useContent } from "../context/ContentContext";
-import { defaultContent } from "../data/defaultContent.js";
 
 const PRESET_RESOURCE_CATEGORIES = [
   "B.Tech",
@@ -16,7 +15,6 @@ const ADMIN_SECTIONS = [
   "contacts",
   "resources",
   "videos",
-  "content",
   "safety",
 ];
 
@@ -36,10 +34,6 @@ const SECTION_META = {
   videos: {
     title: "Video Manager",
     subtitle: "Publish and organize YouTube learning videos.",
-  },
-  content: {
-    title: "Content JSON",
-    subtitle: "Advanced full-content editor for complete control.",
   },
   safety: {
     title: "Safety Controls",
@@ -74,7 +68,6 @@ export default function AdminPage() {
   const {
     content,
     saveContentToServer,
-    isHydratingContent,
     resetContentFromAdmin,
     adminSessionKey,
   } = useContent();
@@ -87,10 +80,6 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");
   const [resetPhrase, setResetPhrase] = useState("");
-  const [editorValue, setEditorValue] = useState(() =>
-    JSON.stringify(content ?? defaultContent, null, 2),
-  );
-
   const [resourceHeading, setResourceHeading] = useState(
     () => content?.home?.freeResources?.heading || "Free Resources",
   );
@@ -127,7 +116,9 @@ export default function AdminPage() {
       ? content.home.freeResources.categories
       : PRESET_RESOURCE_CATEGORIES;
 
-  const youtubeResources = Array.isArray(content?.home?.freeResources?.youtubeLinks)
+  const youtubeResources = Array.isArray(
+    content?.home?.freeResources?.youtubeLinks,
+  )
     ? content.home.freeResources.youtubeLinks
     : [];
 
@@ -135,8 +126,9 @@ export default function AdminPage() {
   const sectionMeta = SECTION_META[adminSection];
 
   useEffect(() => {
-    setEditorValue(JSON.stringify(content ?? defaultContent, null, 2));
-    setResourceHeading(content?.home?.freeResources?.heading || "Free Resources");
+    setResourceHeading(
+      content?.home?.freeResources?.heading || "Free Resources",
+    );
     setResourceSubtitle(
       content?.home?.freeResources?.subtitle ||
         "Download practical notes, question banks, and revision sheets.",
@@ -185,7 +177,9 @@ export default function AdminPage() {
   }, [isLoggedIn]);
 
   const totalEnquiries = contactInbox.length;
-  const newEnquiries = contactInbox.filter((item) => item.status !== "read").length;
+  const newEnquiries = contactInbox.filter(
+    (item) => item.status !== "read",
+  ).length;
   const readEnquiries = totalEnquiries - newEnquiries;
 
   const filteredEnquiries = contactInbox.filter((item) => {
@@ -201,9 +195,16 @@ export default function AdminPage() {
   const quickLinks = useMemo(
     () => [
       { to: "/admin/contacts", label: "Open Contacts", value: totalEnquiries },
-      { to: "/admin/resources", label: "Open Resources", value: freeResources.length },
-      { to: "/admin/videos", label: "Open Videos", value: youtubeResources.length },
-      { to: "/admin/content", label: "Open JSON", value: "Advanced" },
+      {
+        to: "/admin/resources",
+        label: "Open Resources",
+        value: freeResources.length,
+      },
+      {
+        to: "/admin/videos",
+        label: "Open Videos",
+        value: youtubeResources.length,
+      },
     ],
     [totalEnquiries, freeResources.length, youtubeResources.length],
   );
@@ -276,7 +277,9 @@ export default function AdminPage() {
     event.preventDefault();
 
     if (!isEnvReady) {
-      setStatus("Admin credentials are not configured in environment variables.");
+      setStatus(
+        "Admin credentials are not configured in environment variables.",
+      );
       return;
     }
 
@@ -290,23 +293,6 @@ export default function AdminPage() {
     setStatus("Logged in. You can now manage all features.");
     setPassword("");
     navigate("/admin/dashboard", { replace: true });
-  }
-
-  async function handleSave() {
-    let parsed;
-    try {
-      parsed = JSON.parse(editorValue);
-    } catch {
-      setStatus("Invalid JSON. Please fix format before saving.");
-      return;
-    }
-
-    try {
-      await saveContentToServer(parsed);
-      setStatus("Content saved. Changes persist after refresh.");
-    } catch {
-      setStatus("Could not save content to MongoDB.");
-    }
   }
 
   async function setFreeResources({
@@ -327,7 +313,8 @@ export default function AdminPage() {
           subtitle:
             subtitle.trim() ||
             "Download practical notes, question banks, and revision sheets.",
-          youtubeHeading: nextYoutubeHeading.trim() || "YouTube Learning Videos",
+          youtubeHeading:
+            nextYoutubeHeading.trim() || "YouTube Learning Videos",
           categories,
           youtubeLinks,
           items: nextItems,
@@ -387,7 +374,9 @@ export default function AdminPage() {
       return;
     }
 
-    const remaining = resourceCategories.filter((item) => item !== categoryToDelete);
+    const remaining = resourceCategories.filter(
+      (item) => item !== categoryToDelete,
+    );
 
     const nextCategories =
       remaining.length > 0 ? remaining : [PRESET_RESOURCE_CATEGORIES[3]];
@@ -397,7 +386,9 @@ export default function AdminPage() {
       : nextCategories[0];
 
     const nextItems = freeResources.map((item) =>
-      item.category === categoryToDelete ? { ...item, category: fallbackCategory } : item,
+      item.category === categoryToDelete
+        ? { ...item, category: fallbackCategory }
+        : item,
     );
 
     await setFreeResources({ nextItems, categories: nextCategories });
@@ -454,7 +445,8 @@ export default function AdminPage() {
       const nextItems = [
         {
           id:
-            typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+            typeof crypto !== "undefined" &&
+            typeof crypto.randomUUID === "function"
               ? crypto.randomUUID()
               : String(Date.now()),
           title,
@@ -477,14 +469,17 @@ export default function AdminPage() {
   }
 
   async function handleDeleteFreeResource(resourceToDelete) {
-    const shouldDelete = window.confirm("Delete this resource entry permanently?");
+    const shouldDelete = window.confirm(
+      "Delete this resource entry permanently?",
+    );
     if (!shouldDelete) {
       return;
     }
 
     const nextItems = freeResources.filter((item) => {
       const sameId = resourceToDelete?.id && item?.id === resourceToDelete.id;
-      const sameUrl = resourceToDelete?.url && item?.url === resourceToDelete.url;
+      const sameUrl =
+        resourceToDelete?.url && item?.url === resourceToDelete.url;
       const sameTitle =
         resourceToDelete?.title && item?.title === resourceToDelete.title;
       return !(sameId || (sameUrl && sameTitle));
@@ -538,7 +533,8 @@ export default function AdminPage() {
     const nextYoutube = [
       {
         id:
-          typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          typeof crypto !== "undefined" &&
+          typeof crypto.randomUUID === "function"
             ? crypto.randomUUID()
             : `yt-${Date.now()}`,
         title: youtubeTitle.trim(),
@@ -633,7 +629,11 @@ export default function AdminPage() {
               />
             </label>
 
-            <button type="submit" className="btn btn-primary" disabled={!isEnvReady}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={!isEnvReady}
+            >
               Login
             </button>
             <p className="status-text">{status}</p>
@@ -656,7 +656,11 @@ export default function AdminPage() {
           <h3>Control Menu</h3>
           <p>Use dedicated pages to avoid accidental changes.</p>
 
-          <div className="admin-metric-grid" role="list" aria-label="Admin metrics">
+          <div
+            className="admin-metric-grid"
+            role="list"
+            aria-label="Admin metrics"
+          >
             <article role="listitem" className="admin-metric-item">
               <strong>{totalEnquiries}</strong>
               <span>Total enquiries</span>
@@ -672,28 +676,44 @@ export default function AdminPage() {
           </div>
 
           <nav className="admin-nav-links" aria-label="Admin sections">
-            <Link className={`admin-nav-link ${adminSection === "dashboard" ? "active" : ""}`} to="/admin/dashboard">
+            <Link
+              className={`admin-nav-link ${adminSection === "dashboard" ? "active" : ""}`}
+              to="/admin/dashboard"
+            >
               Dashboard
             </Link>
-            <Link className={`admin-nav-link ${adminSection === "contacts" ? "active" : ""}`} to="/admin/contacts">
+            <Link
+              className={`admin-nav-link ${adminSection === "contacts" ? "active" : ""}`}
+              to="/admin/contacts"
+            >
               Contacts
             </Link>
-            <Link className={`admin-nav-link ${adminSection === "resources" ? "active" : ""}`} to="/admin/resources">
+            <Link
+              className={`admin-nav-link ${adminSection === "resources" ? "active" : ""}`}
+              to="/admin/resources"
+            >
               Resources
             </Link>
-            <Link className={`admin-nav-link ${adminSection === "videos" ? "active" : ""}`} to="/admin/videos">
+            <Link
+              className={`admin-nav-link ${adminSection === "videos" ? "active" : ""}`}
+              to="/admin/videos"
+            >
               Videos
             </Link>
-            <Link className={`admin-nav-link ${adminSection === "content" ? "active" : ""}`} to="/admin/content">
-              Content JSON
-            </Link>
-            <Link className={`admin-nav-link ${adminSection === "safety" ? "active" : ""}`} to="/admin/safety">
+            <Link
+              className={`admin-nav-link ${adminSection === "safety" ? "active" : ""}`}
+              to="/admin/safety"
+            >
               Safety
             </Link>
           </nav>
 
           <div className="admin-actions">
-            <button type="button" className="btn btn-outline" onClick={handleLogout}>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={handleLogout}
+            >
               Logout
             </button>
             <Link className="btn btn-primary" to="/">
@@ -716,7 +736,11 @@ export default function AdminPage() {
             <section className="admin-work-block">
               <div className="admin-shortcuts-grid">
                 {quickLinks.map((item) => (
-                  <Link key={item.to} to={item.to} className="admin-shortcut-card">
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="admin-shortcut-card"
+                  >
                     <h4>{item.label}</h4>
                     <p>{item.value}</p>
                   </Link>
@@ -726,10 +750,13 @@ export default function AdminPage() {
               <article className="admin-guidance-card">
                 <h4>Professional workflow</h4>
                 <ul>
-                  <li>Review Contacts first and mark old queries as reviewed.</li>
+                  <li>
+                    Review Contacts first and mark old queries as reviewed.
+                  </li>
                   <li>Update Resources and Videos using validated links.</li>
-                  <li>Use Content JSON only for advanced bulk edits.</li>
-                  <li>Use Safety page for reset operations with confirmation.</li>
+                  <li>
+                    Use Safety page for reset operations with confirmation.
+                  </li>
                 </ul>
               </article>
             </section>
@@ -773,7 +800,9 @@ export default function AdminPage() {
               </div>
 
               {filteredEnquiries.length === 0 ? (
-                <p className="admin-empty-inbox">No enquiries found for this filter yet.</p>
+                <p className="admin-empty-inbox">
+                  No enquiries found for this filter yet.
+                </p>
               ) : (
                 <div className="admin-enquiry-list">
                   {filteredEnquiries.map((item) => (
@@ -784,17 +813,37 @@ export default function AdminPage() {
                       <header>
                         <h4>{item.name || "Unnamed student"}</h4>
                         <span>
-                          {item.createdAt ? new Date(item.createdAt).toLocaleString() : "No date"}
+                          {item.createdAt
+                            ? new Date(item.createdAt).toLocaleString()
+                            : "No date"}
                         </span>
                       </header>
-                      <p><strong>Email:</strong> {item.email || "-"}</p>
-                      <p><strong>Phone:</strong> {item.phone || "-"}</p>
-                      <p><strong>City:</strong> {item.city || "-"}</p>
-                      <p><strong>Student Type:</strong> {item.studentType || "-"}</p>
-                      <p><strong>Program:</strong> {item.program || "-"}</p>
-                      <p><strong>Learning Mode:</strong> {item.learningMode || "-"}</p>
-                      <p><strong>Preferred Start:</strong> {item.startMonth || "-"}</p>
-                      <p><strong>Message:</strong> {item.message || "-"}</p>
+                      <p>
+                        <strong>Email:</strong> {item.email || "-"}
+                      </p>
+                      <p>
+                        <strong>Phone:</strong> {item.phone || "-"}
+                      </p>
+                      <p>
+                        <strong>City:</strong> {item.city || "-"}
+                      </p>
+                      <p>
+                        <strong>Student Type:</strong> {item.studentType || "-"}
+                      </p>
+                      <p>
+                        <strong>Program:</strong> {item.program || "-"}
+                      </p>
+                      <p>
+                        <strong>Learning Mode:</strong>{" "}
+                        {item.learningMode || "-"}
+                      </p>
+                      <p>
+                        <strong>Preferred Start:</strong>{" "}
+                        {item.startMonth || "-"}
+                      </p>
+                      <p>
+                        <strong>Message:</strong> {item.message || "-"}
+                      </p>
 
                       <div className="admin-actions">
                         <button
@@ -849,7 +898,9 @@ export default function AdminPage() {
                   <input
                     type="text"
                     value={resourceSubtitle}
-                    onChange={(event) => setResourceSubtitle(event.target.value)}
+                    onChange={(event) =>
+                      setResourceSubtitle(event.target.value)
+                    }
                     placeholder="Download practical notes, question banks, and revision sheets."
                   />
                 </label>
@@ -862,17 +913,26 @@ export default function AdminPage() {
                     placeholder="YouTube Learning Videos"
                   />
                 </label>
-                <button type="button" className="btn btn-outline" onClick={handleSaveResourceText}>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={handleSaveResourceText}
+                >
                   Save Section Text
                 </button>
               </div>
 
-              <form className="admin-resource-form" onSubmit={handleAddFreeResource}>
+              <form
+                className="admin-resource-form"
+                onSubmit={handleAddFreeResource}
+              >
                 <label>
                   Resource Category
                   <select
                     value={selectedCategory}
-                    onChange={(event) => setSelectedCategory(event.target.value)}
+                    onChange={(event) =>
+                      setSelectedCategory(event.target.value)
+                    }
                   >
                     {resourceCategories.map((category) => (
                       <option key={category} value={category}>
@@ -904,8 +964,14 @@ export default function AdminPage() {
                   />
                 </label>
 
-                <p className="admin-upload-hint">Only Google Drive links are allowed.</p>
-                <button type="submit" className="btn btn-primary" disabled={isSavingResource}>
+                <p className="admin-upload-hint">
+                  Only Google Drive links are allowed.
+                </p>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isSavingResource}
+                >
                   {isSavingResource ? "Saving..." : "Add Drive Resource"}
                 </button>
               </form>
@@ -920,7 +986,11 @@ export default function AdminPage() {
                     placeholder="e.g. Civil Engineering"
                   />
                 </label>
-                <button type="button" className="btn btn-outline" onClick={handleAddCategory}>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={handleAddCategory}
+                >
                   Add Filter
                 </button>
               </div>
@@ -943,20 +1013,36 @@ export default function AdminPage() {
 
               <div className="admin-resource-list">
                 {freeResources.length === 0 ? (
-                  <p className="admin-empty-inbox">No free resources uploaded yet.</p>
+                  <p className="admin-empty-inbox">
+                    No free resources uploaded yet.
+                  </p>
                 ) : (
                   freeResources.map((item) => (
-                    <article key={item.id || item.title} className="admin-enquiry-item read">
+                    <article
+                      key={item.id || item.title}
+                      className="admin-enquiry-item read"
+                    >
                       <header>
                         <h4>{item.title || "Untitled"}</h4>
                         <span>
-                          {item.createdAt ? new Date(item.createdAt).toLocaleString() : "No date"}
+                          {item.createdAt
+                            ? new Date(item.createdAt).toLocaleString()
+                            : "No date"}
                         </span>
                       </header>
-                      <p><strong>Category:</strong> {item.category || "Others"}</p>
-                      <p><strong>Drive Link:</strong> {item.url || "-"}</p>
+                      <p>
+                        <strong>Category:</strong> {item.category || "Others"}
+                      </p>
+                      <p>
+                        <strong>Drive Link:</strong> {item.url || "-"}
+                      </p>
                       <div className="admin-actions">
-                        <a className="btn btn-outline" href={item.url} target="_blank" rel="noopener noreferrer">
+                        <a
+                          className="btn btn-outline"
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           Open
                         </a>
                         <button
@@ -976,7 +1062,10 @@ export default function AdminPage() {
 
           {adminSection === "videos" ? (
             <section className="admin-work-block">
-              <form className="admin-resource-form" onSubmit={handleAddYoutubeLink}>
+              <form
+                className="admin-resource-form"
+                onSubmit={handleAddYoutubeLink}
+              >
                 <h3>Add YouTube Learning Frame</h3>
                 <label>
                   Video Title (optional)
@@ -1004,16 +1093,28 @@ export default function AdminPage() {
 
               <div className="admin-resource-list">
                 {youtubeResources.length === 0 ? (
-                  <p className="admin-empty-inbox">No YouTube links added yet.</p>
+                  <p className="admin-empty-inbox">
+                    No YouTube links added yet.
+                  </p>
                 ) : (
                   youtubeResources.map((video, index) => (
-                    <article key={video.id || video.url || index} className="admin-enquiry-item read">
+                    <article
+                      key={video.id || video.url || index}
+                      className="admin-enquiry-item read"
+                    >
                       <header>
                         <h4>{video.title || `YouTube Video ${index + 1}`}</h4>
                       </header>
-                      <p><strong>YouTube:</strong> {video.url}</p>
+                      <p>
+                        <strong>YouTube:</strong> {video.url}
+                      </p>
                       <div className="admin-actions">
-                        <a className="btn btn-outline" href={video.url} target="_blank" rel="noopener noreferrer">
+                        <a
+                          className="btn btn-outline"
+                          href={video.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           Open
                         </a>
                         <button
@@ -1031,45 +1132,13 @@ export default function AdminPage() {
             </section>
           ) : null}
 
-          {adminSection === "content" ? (
-            <section className="admin-work-block">
-              <div className="admin-editor-top">
-                <h3>Advanced Content JSON</h3>
-                <div className="admin-actions">
-                  <button
-                    type="button"
-                    className="btn btn-outline"
-                    onClick={() =>
-                      setEditorValue(JSON.stringify(content ?? defaultContent, null, 2))
-                    }
-                  >
-                    Reload Current
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={handleSave}
-                    disabled={isHydratingContent}
-                  >
-                    Save Content
-                  </button>
-                </div>
-              </div>
-              <textarea
-                className="admin-json-editor"
-                value={editorValue}
-                onChange={(event) => setEditorValue(event.target.value)}
-                spellCheck="false"
-              />
-            </section>
-          ) : null}
-
           {adminSection === "safety" ? (
             <section className="admin-work-block">
               <article className="admin-safety-card">
                 <h3>Reset Content</h3>
                 <p>
-                  This action will reset all content in MongoDB back to default values.
+                  This action will reset all content in MongoDB back to default
+                  values.
                 </p>
                 <label>
                   Type RESET to confirm
@@ -1080,7 +1149,11 @@ export default function AdminPage() {
                     placeholder="RESET"
                   />
                 </label>
-                <button type="button" className="btn btn-outline" onClick={handleReset}>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={handleReset}
+                >
                   Clear Saved Content
                 </button>
               </article>

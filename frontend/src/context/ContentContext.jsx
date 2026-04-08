@@ -46,27 +46,49 @@ function deepMerge(base, override) {
   return override === undefined ? base : override;
 }
 
-function sanitizeLegacyTerms(value) {
-  if (typeof value === "string") {
-    return value
-      .replace(/political\s+science/gi, "polytechnic civil engineering")
-      .replace(/political\s+theory/gi, "polytechnic engineering")
-      .replace(/political/gi, "polytechnic");
-  }
+function extractDbManagedContent(source) {
+  const freeResources = source?.home?.freeResources || {};
+  const data = source?.data || {};
 
-  if (Array.isArray(value)) {
-    return value.map((item) => sanitizeLegacyTerms(item));
-  }
+  return {
+    home: {
+      freeResources: {
+        heading:
+          typeof freeResources.heading === "string"
+            ? freeResources.heading
+            : defaultContent.home.freeResources.heading,
+        subtitle:
+          typeof freeResources.subtitle === "string"
+            ? freeResources.subtitle
+            : defaultContent.home.freeResources.subtitle,
+        youtubeHeading:
+          typeof freeResources.youtubeHeading === "string"
+            ? freeResources.youtubeHeading
+            : defaultContent.home.freeResources.youtubeHeading,
+        categories: Array.isArray(freeResources.categories)
+          ? freeResources.categories
+          : defaultContent.home.freeResources.categories,
+        items: Array.isArray(freeResources.items)
+          ? freeResources.items
+          : defaultContent.home.freeResources.items,
+        youtubeLinks: Array.isArray(freeResources.youtubeLinks)
+          ? freeResources.youtubeLinks
+          : defaultContent.home.freeResources.youtubeLinks,
+      },
+    },
+    data: {
+      courses: Array.isArray(data.courses)
+        ? data.courses
+        : defaultContent.data.courses,
+      resources: Array.isArray(data.resources)
+        ? data.resources
+        : defaultContent.data.resources,
+    },
+  };
+}
 
-  if (isPlainObject(value)) {
-    const output = {};
-    for (const [key, item] of Object.entries(value)) {
-      output[key] = sanitizeLegacyTerms(item);
-    }
-    return output;
-  }
-
-  return value;
+function composeAppContent(source) {
+  return deepMerge(defaultContent, extractDbManagedContent(source));
 }
 
 function loadLocalContent() {
@@ -77,8 +99,7 @@ function loadLocalContent() {
     }
 
     const parsed = JSON.parse(raw);
-    const merged = deepMerge(defaultContent, parsed);
-    return sanitizeLegacyTerms(merged);
+    return composeAppContent(parsed);
   } catch {
     return null;
   }
@@ -124,11 +145,19 @@ export function ContentProvider({ children }) {
           throw new Error("No content document in database.");
         }
 
-        const normalized = sanitizeLegacyTerms(
-          deepMerge(defaultContent, payload.content),
-        );
+        const dbManaged = extractDbManagedContent(payload.content);
+        const normalized = composeAppContent(payload.content);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
         setContent(normalized);
+
+        // Migrate older full-content documents to the restricted DB shape.
+        if (JSON.stringify(payload.content) !== JSON.stringify(dbManaged)) {
+          await fetch(contentUrl, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dbManaged),
+          });
+        }
       } catch (error) {
         const localBackup = loadLocalContent();
         if (isMounted) {
@@ -166,9 +195,8 @@ export function ContentProvider({ children }) {
       isHydratingContent,
       contentLoadError,
       saveContentToServer: async (nextContent) => {
-        const normalized = sanitizeLegacyTerms(
-          deepMerge(defaultContent, nextContent),
-        );
+        const dbManaged = extractDbManagedContent(nextContent);
+        const normalized = composeAppContent(nextContent);
         setContent(normalized);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
 
@@ -176,7 +204,7 @@ export function ContentProvider({ children }) {
         const response = await fetch(contentUrl, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(normalized),
+          body: JSON.stringify(dbManaged),
         });
 
         if (!response.ok) {
@@ -188,12 +216,13 @@ export function ContentProvider({ children }) {
       },
       resetContentFromAdmin: async () => {
         localStorage.removeItem(STORAGE_KEY);
+        const dbManagedDefaults = extractDbManagedContent(defaultContent);
 
         const contentUrl = getApiUrl("/api/content");
         const response = await fetch(contentUrl, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(defaultContent),
+          body: JSON.stringify(dbManagedDefaults),
         });
 
         if (!response.ok) {
